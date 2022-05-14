@@ -18,6 +18,13 @@
         <version>2.6.6</version>
     </parent>
 
+    <properties>
+        <project.version>1.0-SNAPSHOT</project.version>
+        <jjwt.version>0.9.1</jjwt.version>
+        <mapstruct.version>1.4.2.Final</mapstruct.version>
+        <springdoc.version>1.6.7</springdoc.version>
+    </properties>
+
     <packaging>pom</packaging>
 
     <dependencies>
@@ -35,18 +42,71 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <!-- OMNIKA DEPENDENCIES -->
+                <groupId>io.omnika.common.security-starter</groupId>
+                <artifactId>security-starter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>io.omnika.common</groupId>
                 <artifactId>common</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>io.omnika.service</groupId>
                 <artifactId>service</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.omnika.common.rest</groupId>
+                <artifactId>rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- API DOCUMENTATION -->
+
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+
+            <!-- LIBS -->
+
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jjwt.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

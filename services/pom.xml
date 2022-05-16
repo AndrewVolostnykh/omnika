@@ -11,6 +11,10 @@
 
     <groupId>io.omnika.services</groupId>
     <artifactId>services</artifactId>
+    <packaging>pom</packaging>
 
+    <modules>
+        <module>management</module>
+    </modules>
 
 </project>

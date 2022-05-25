@@ -1,8 +1,9 @@
 package io.omnika.services.management.model;
 
 import io.omnika.common.security.model.Authority;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -29,12 +30,16 @@ public class User {
 
     private String password;
 
+    private boolean active;
+
+    private UUID activationToken;
+
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private Set<Tenant> tenants = new HashSet<>();
+    private List<Tenant> tenants = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private Set<Manager> managers = new HashSet<>();
+    private List<Manager> managers = new ArrayList<>();
 }

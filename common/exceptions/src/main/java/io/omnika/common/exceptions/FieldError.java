@@ -1,4 +1,4 @@
-package io.omnika.common.exception;
+package io.omnika.common.exceptions;
 
 import lombok.Getter;
 import lombok.Setter;

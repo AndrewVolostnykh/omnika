@@ -1,6 +1,6 @@
 package io.omnika.common.security.core.service;
 
-import io.omnika.common.security.model.AccountPrincipal;
+import io.omnika.common.security.model.UserPrincipal;
 import javax.servlet.http.HttpServletRequest;
 
 public interface TokenService {
@@ -10,6 +10,6 @@ public interface TokenService {
 
     String extractToken(HttpServletRequest servletRequest);
 
-    AccountPrincipal parseToken(String token);
+    UserPrincipal parseToken(String token);
 
 }

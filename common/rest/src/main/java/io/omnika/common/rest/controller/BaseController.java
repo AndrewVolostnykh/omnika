@@ -1,11 +1,11 @@
-package io.omnika.common.exception.controller;
+package io.omnika.common.rest.controller;
 
-import io.omnika.common.exception.Error;
-import io.omnika.common.exception.ExceptionCodes.Auth;
-import io.omnika.common.exception.FieldError;
-import io.omnika.common.exception.exceptions.ValidationException;
-import io.omnika.common.exception.exceptions.auth.IncorrectPasswordException;
-import io.omnika.common.exception.exceptions.auth.UserNotFoundException;
+import io.omnika.common.exceptions.Error;
+import io.omnika.common.exceptions.ExceptionCodes.Auth;
+import io.omnika.common.exceptions.FieldError;
+import io.omnika.common.exceptions.ValidationException;
+import io.omnika.common.exceptions.auth.IncorrectPasswordException;
+import io.omnika.common.exceptions.auth.UserNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;

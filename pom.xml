@@ -66,6 +66,12 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>io.omnika.common.exceptions</groupId>
+                <artifactId>exceptions</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- API DOCUMENTATION -->
 
             <dependency>

@@ -1,6 +1,5 @@
-package io.omnika.common.exception.exceptions;
+package io.omnika.common.exceptions;
 
-import io.omnika.common.exception.FieldError;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;

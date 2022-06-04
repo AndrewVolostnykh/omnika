@@ -1,4 +1,4 @@
-package io.omnika.common.exception.exceptions.auth;
+package io.omnika.common.exceptions.auth;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

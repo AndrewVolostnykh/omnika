@@ -1,6 +1,8 @@
 package io.omnika.services.management.model;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -29,6 +31,6 @@ public class Tenant {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private Set<Manager> managers;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "tenant", cascade = CascadeType.ALL)
+    private List<Manager> managers = new ArrayList<>();
 }

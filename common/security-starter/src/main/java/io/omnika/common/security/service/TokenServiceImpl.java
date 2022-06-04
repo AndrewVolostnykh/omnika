@@ -3,8 +3,8 @@ package io.omnika.common.security.service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.omnika.common.security.core.service.TokenService;
-import io.omnika.common.security.model.AccountPrincipal;
 import io.omnika.common.security.model.Authority;
+import io.omnika.common.security.model.UserPrincipal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +33,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public AccountPrincipal parseToken(String token) {
+    public UserPrincipal parseToken(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(tokenSigningKey)
                 .parseClaimsJws(token).getBody();
@@ -47,7 +47,7 @@ public class TokenServiceImpl implements TokenService {
                 .map(authority -> new SimpleGrantedAuthority(authority.name()))
                 .collect(Collectors.toList());
 
-        AccountPrincipal principal = new AccountPrincipal();
+        UserPrincipal principal = new UserPrincipal();
         principal.setUserId(userId);
         principal.setEmail(email);
         principal.setAuthorities(authorities);

@@ -16,9 +16,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
+            <groupId>io.omnika.common</groupId>
+            <artifactId>common</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>io.omnika.common.exceptions</groupId>
+            <artifactId>exceptions</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>

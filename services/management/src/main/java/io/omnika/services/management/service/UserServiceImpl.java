@@ -16,7 +16,6 @@ import io.omnika.common.security.model.UserPrincipal;
 import io.omnika.common.security.utils.AuthenticationHelper;
 import io.omnika.services.management.converters.UserConverter;
 import io.omnika.services.management.core.service.UserService;
-import io.omnika.services.management.converters.mappers.UserMapper;
 import io.omnika.services.management.model.User;
 import io.omnika.services.management.repository.UserRepository;
 import java.util.UUID;
@@ -47,7 +46,7 @@ class UserServiceImpl implements UserService {
         user.setActive(true);
         user.setPassword(passwordEncoder.encode(signingDto.getPassword()));
 
-        return TokenDto.builder().authToken(tokenService.createToken(userRepository.save(user))).build();
+        return new TokenDto(tokenService.createToken(userRepository.save(user)));
     }
 
     @Override
@@ -75,7 +74,7 @@ class UserServiceImpl implements UserService {
         }
 
         if (passwordEncoder.matches(signingDto.getPassword(), user.getPassword())) {
-            return TokenDto.builder().authToken(tokenService.createToken(user)).build();
+            return new TokenDto(tokenService.createToken(user));
         } else {
             throw new IncorrectPasswordException();
         }
@@ -88,7 +87,7 @@ class UserServiceImpl implements UserService {
         user.setActive(true);
         user.setActivationToken(null);
 
-        return TokenDto.builder().authToken(tokenService.createToken(userRepository.save(userRepository.save(user)))).build();
+        return new TokenDto(tokenService.createToken(userRepository.save(user)));
     }
 
     @Override

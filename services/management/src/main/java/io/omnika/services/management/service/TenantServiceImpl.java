@@ -76,7 +76,7 @@ class TenantServiceImpl implements TenantService {
     @Transactional
     public TenantDto get(Long tenantId) {
         return tenantConverter.toDto(
-                tenantRepository.findById(tenantId)
+                tenantRepository.findById(tenantId) // FIXME: validate that requested tenant owned by user specified in token
                         .orElseThrow(() -> new ObjectNotFoundException(tenantId, Tenant.class))
         );
     }

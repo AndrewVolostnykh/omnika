@@ -17,6 +17,7 @@
         <module>rest</module>
         <module>security-starter</module>
         <module>exceptions</module>
+        <module>ipc</module>
     </modules>
 
     <dependencies>

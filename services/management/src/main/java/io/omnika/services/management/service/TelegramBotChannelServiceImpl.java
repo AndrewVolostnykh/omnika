@@ -17,6 +17,7 @@ class TelegramBotChannelServiceImpl implements TelegramChannelBotService {
     private final TelegramBotChannelRepository telegramBotChannelRepository;
     private final TelegramBotChannelConverter telegramBotChannelConverter;
 
+    @Override
     public TelegramBotChannelDto create(TelegramBotChannelDto telegramBotChannelDto) {
         // validators
         if (telegramBotChannelDto.getTenantDto().getId() == null) {

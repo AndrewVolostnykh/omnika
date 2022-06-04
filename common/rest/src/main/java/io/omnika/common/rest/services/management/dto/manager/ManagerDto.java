@@ -1,14 +1,14 @@
 package io.omnika.common.rest.services.management.dto.manager;
 
-import io.omnika.common.rest.services.management.dto.TenantDto;
-import io.omnika.common.rest.services.management.dto.UserDto;
 import lombok.Data;
 
 @Data
 public class ManagerDto {
 
+    private Long id;
     private String name;
-    private UserDto user;
-    private TenantDto tenant;
+    // FIXME: need to investigate how to query manager with user information without StackOverflowError
+//    private UserDto user;
+//    private TenantDto tenant;
 
 }

@@ -1,15 +1,15 @@
 package io.omnika.common.exceptions;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
-@EqualsAndHashCode
-public class FieldError extends Error {
+@EqualsAndHashCode(callSuper = true)
+public class FieldValueError extends Error {
 
     private String field;
+    private String value;
 }
+

@@ -1,4 +1,4 @@
-package io.omnika.common.rest.services.management.dto;
+package io.omnika.common.rest.services.management.dto.manager;
 
 import io.omnika.common.exceptions.ExceptionCodes.Validation;
 import javax.validation.constraints.Email;

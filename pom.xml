@@ -10,6 +10,7 @@
     <modules>
         <module>common</module>
         <module>services</module>
+        <module>utils</module>
     </modules>
 
     <parent>
@@ -23,6 +24,9 @@
         <jjwt.version>0.9.1</jjwt.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <springdoc.version>1.6.7</springdoc.version>
+        <archunit-junit5.version>0.12.0</archunit-junit5.version>
+
+        <lombok.version>1.18.12</lombok.version>
     </properties>
 
     <packaging>pom</packaging>
@@ -36,6 +40,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
         </dependency>
     </dependencies>
 
@@ -99,6 +104,23 @@
                 <artifactId>jjwt</artifactId>
                 <version>${jjwt.version}</version>
             </dependency>
+
+            <!-- TESTS -->
+
+            <dependency>
+                <groupId>com.tngtech.archunit</groupId>
+                <artifactId>archunit-junit5-api</artifactId>
+                <version>${archunit-junit5.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.tngtech.archunit</groupId>
+                <artifactId>archunit-junit5-engine</artifactId>
+                <version>${archunit-junit5.version}</version>
+                <scope>test</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

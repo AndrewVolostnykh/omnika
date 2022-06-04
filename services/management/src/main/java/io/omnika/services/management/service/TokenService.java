@@ -9,10 +9,8 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-// FIXME: it is invalid to use different interfaces in every service
-// FIXME: move creation of token to common or create custom TokenService interface in this service
 @Service
-public class TokenService extends TokenServiceImpl {
+class TokenService extends TokenServiceImpl {
     @Value("${security.token.lifetime}")
     private Integer tokenLifetime;
 

@@ -6,8 +6,8 @@ import io.omnika.common.exceptions.ObjectNotFoundException;
 import io.omnika.common.exceptions.ValidationException;
 import io.omnika.common.rest.services.management.dto.TenantDto;
 import io.omnika.common.security.utils.AuthenticationHelper;
+import io.omnika.services.management.converters.TenantConverter;
 import io.omnika.services.management.core.service.TenantService;
-import io.omnika.services.management.mappers.TenantMapper;
 import io.omnika.services.management.model.Tenant;
 import io.omnika.services.management.model.User;
 import io.omnika.services.management.repository.TenantRepository;
@@ -20,10 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class TenantServiceImpl implements TenantService {
+class TenantServiceImpl implements TenantService {
 
     private final TenantRepository tenantRepository;
     private final UserRepository userRepository;
+    private final TenantConverter tenantConverter;
 
     @Override
     public TenantDto create(TenantDto tenantDto) {
@@ -44,12 +45,12 @@ public class TenantServiceImpl implements TenantService {
 
         User currentUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new ObjectNotFoundException(currentUserId, User.class));
-        Tenant toSave = TenantMapper.INSTANCE.tenantDtoToDomain(tenantDto);
+        Tenant toSave = tenantConverter.toDomain(tenantDto);
         toSave.setUser(currentUser);
 
         Tenant saved = tenantRepository.save(toSave);
 
-        return TenantMapper.INSTANCE.tenantToDto(saved);
+        return tenantConverter.toDto(saved);
     }
 
     @Override
@@ -58,23 +59,23 @@ public class TenantServiceImpl implements TenantService {
             throw new IllegalArgumentException("To update id of tenant should be specified");
         }
 
-        Tenant updated = tenantRepository.save(TenantMapper.INSTANCE.tenantDtoToDomain(tenantDto));
+        Tenant updated = tenantRepository.save(tenantConverter.toDomain(tenantDto));
 
-        return TenantMapper.INSTANCE.tenantToDto(updated);
+        return tenantConverter.toDto(updated);
     }
 
     @Override
     public List<TenantDto> list() {
         return tenantRepository.findByUserId(AuthenticationHelper.getAuthenticationDetails().getUserId())
                 .stream()
-                .map(TenantMapper.INSTANCE::tenantToDto)
+                .map(tenantConverter::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public TenantDto get(Long tenantId) {
-        return TenantMapper.INSTANCE.tenantToDto(
+        return tenantConverter.toDto(
                 tenantRepository.findById(tenantId)
                         .orElseThrow(() -> new ObjectNotFoundException(tenantId, Tenant.class))
         );

@@ -23,4 +23,11 @@ public class ExceptionCodes {
         public static final String USER_NOT_ACTIVE = "USER_NOT_ACTIVE";
     }
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class NotFound {
+
+        public static final String OBJECT_NOT_FOUND = "OBJECT_NOT_FOUND";
+
+    }
+
 }

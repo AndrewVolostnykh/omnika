@@ -19,7 +19,6 @@ public class AuthControllerImpl extends BaseController implements AuthController
 
     private final UserService userService;
 
-    // TODO: mb lets return token to simplify auth process
     @Override
     public TokenDto signUp(@Valid SigningDto signingDto) {
         return userService.signUp(signingDto);

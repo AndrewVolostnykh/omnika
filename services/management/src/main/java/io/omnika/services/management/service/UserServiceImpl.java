@@ -14,8 +14,9 @@ import io.omnika.common.rest.services.management.dto.auth.TokenDto;
 import io.omnika.common.security.model.Authority;
 import io.omnika.common.security.model.UserPrincipal;
 import io.omnika.common.security.utils.AuthenticationHelper;
+import io.omnika.services.management.converters.UserConverter;
 import io.omnika.services.management.core.service.UserService;
-import io.omnika.services.management.mappers.UserMapper;
+import io.omnika.services.management.converters.mappers.UserMapper;
 import io.omnika.services.management.model.User;
 import io.omnika.services.management.repository.UserRepository;
 import java.util.UUID;
@@ -27,11 +28,12 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+class UserServiceImpl implements UserService {
 
     private final TokenService tokenService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserConverter userConverter;
 
     @Override
     public TokenDto signUp(SigningDto signingDto) {
@@ -59,7 +61,7 @@ public class UserServiceImpl implements UserService {
         // TODO: there sending email
         log.warn("User to activate: email [{}], token [{}]", user.getEmail(), user.getActivationToken());
 
-        return UserMapper.INSTANCE.userToDto(userRepository.save(user));
+        return userConverter.toDto(userRepository.save(user));
     }
 
     @Override
@@ -91,7 +93,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto get(Long id) {
-        return UserMapper.INSTANCE.userToDto(
+        return userConverter.toDto(
                 userRepository.findById(id)
                         .orElseThrow(() -> new ObjectNotFoundException(id, User.class))
         );
@@ -102,8 +104,7 @@ public class UserServiceImpl implements UserService {
         UserPrincipal userPrincipal = AuthenticationHelper.getAuthenticationDetails();
 
         return userRepository.findById(userPrincipal.getUserId())
-                .map(UserMapper.INSTANCE::userToDto)
+                .map(userConverter::toDto)
                 .orElseThrow(() -> new ObjectNotFoundException(userPrincipal.getUserId(), User.class));
-
     }
 }

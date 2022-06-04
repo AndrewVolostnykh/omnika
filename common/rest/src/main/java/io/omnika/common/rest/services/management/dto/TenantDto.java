@@ -1,5 +1,6 @@
 package io.omnika.common.rest.services.management.dto;
 
+import io.omnika.common.rest.services.management.dto.manager.ManagerDto;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

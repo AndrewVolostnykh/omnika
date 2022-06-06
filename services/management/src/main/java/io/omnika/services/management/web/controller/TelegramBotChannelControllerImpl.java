@@ -5,7 +5,9 @@ import io.omnika.common.rest.services.management.dto.channel.TelegramBotChannelD
 import io.omnika.services.management.core.service.TelegramChannelBotService;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
 @RequiredArgsConstructor
 public class TelegramBotChannelControllerImpl implements TelegramBotChannelController {
 

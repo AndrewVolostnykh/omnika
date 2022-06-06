@@ -16,6 +16,7 @@
 
     <modules>
         <module>management</module>
+        <module>telegram-channel</module>
     </modules>
 
 </project>

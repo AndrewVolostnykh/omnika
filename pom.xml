@@ -30,6 +30,7 @@
         <spring-test.version>2.5.0</spring-test.version>
         <h2db.version>2.1.212</h2db.version>
         <junit.vintage.version>5.8.2</junit.vintage.version>
+        <telegram-bots.version>5.7.1</telegram-bots.version>
     </properties>
 
     <packaging>pom</packaging>
@@ -80,6 +81,12 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>io.omnika.common.ipc</groupId>
+                <artifactId>ipc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- SPRING -->
 
             <dependency>
@@ -116,6 +123,12 @@
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
                 <version>${jjwt.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.telegram</groupId>
+                <artifactId>telegrambots-spring-boot-starter</artifactId>
+                <version>${telegram-bots.version}</version>
             </dependency>
 
             <!-- TESTS -->

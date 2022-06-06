@@ -38,7 +38,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 @Slf4j
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = OmnikaManagementApplication.class)
+@SpringBootTest(classes = ManagementApplication.class)
 @AutoConfigureMockMvc
 @TestPropertySource(
         properties = {

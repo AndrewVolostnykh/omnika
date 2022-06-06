@@ -9,7 +9,9 @@ import io.omnika.services.management.core.service.UserService;
 import java.util.UUID;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
 @RequiredArgsConstructor
 public class AuthControllerImpl extends BaseController implements AuthController {
 

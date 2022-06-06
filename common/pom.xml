@@ -18,6 +18,7 @@
         <module>security-starter</module>
         <module>exceptions</module>
         <module>ipc</module>
+        <module>utils</module>
     </modules>
 
     <dependencies>

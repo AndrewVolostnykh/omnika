@@ -12,7 +12,7 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.library.Architectures;
 import org.springframework.stereotype.Service;
 
-@AnalyzeClasses(packagesOf = OmnikaManagementApplication.class, importOptions = ImportOption.DoNotIncludeTests.class)
+@AnalyzeClasses(packagesOf = ManagementApplication.class, importOptions = ImportOption.DoNotIncludeTests.class)
 public class ArchTests {
 
     private final DescribedPredicate<JavaClass> serviceInterfacePredicate = new DescribedPredicate<>("interface") {

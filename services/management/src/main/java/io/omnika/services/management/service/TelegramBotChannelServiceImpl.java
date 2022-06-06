@@ -7,6 +7,7 @@ import io.omnika.services.management.model.channel.TelegramBotChannel;
 import io.omnika.services.management.repository.channel.ChannelRepository;
 import io.omnika.services.management.repository.channel.TelegramBotChannelRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +17,7 @@ class TelegramBotChannelServiceImpl implements TelegramChannelBotService {
     private final ChannelRepository channelRepository;
     private final TelegramBotChannelRepository telegramBotChannelRepository;
     private final TelegramBotChannelConverter telegramBotChannelConverter;
+    private final StreamBridge streamBridge;
 
     @Override
     public TelegramBotChannelDto create(TelegramBotChannelDto telegramBotChannelDto) {
@@ -27,6 +29,11 @@ class TelegramBotChannelServiceImpl implements TelegramChannelBotService {
         TelegramBotChannel telegramBotChannel = telegramBotChannelConverter.toDomain(telegramBotChannelDto);
         channelRepository.save(telegramBotChannel.getChannel());
         TelegramBotChannel saved = telegramBotChannelRepository.save(telegramBotChannel);
-        return telegramBotChannelConverter.toDto(saved);
+        TelegramBotChannelDto result = telegramBotChannelConverter.toDto(saved);
+
+        // FIXME: make aspect to remove code duplication from here
+//        streamBridge.send("newTelegramChannel-in-0", result);
+
+        return result;
     }
 }

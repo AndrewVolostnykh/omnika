@@ -15,6 +15,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 @Data
 @Entity
@@ -32,6 +33,7 @@ public class User {
 
     private boolean active;
 
+    @Type(type = "uuid-char")
     private UUID activationToken;
 
     @Enumerated(EnumType.STRING)

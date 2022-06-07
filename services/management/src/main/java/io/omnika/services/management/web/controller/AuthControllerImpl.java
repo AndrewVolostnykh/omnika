@@ -9,17 +9,12 @@ import io.omnika.services.management.core.service.UserService;
 import java.util.UUID;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthControllerImpl extends BaseController implements AuthController {
 
     private final UserService userService;
 
-    // TODO: mb lets return token to simplify auth process
     @Override
     public TokenDto signUp(@Valid SigningDto signingDto) {
         return userService.signUp(signingDto);

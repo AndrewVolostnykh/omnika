@@ -1,5 +1,6 @@
 package io.omnika.services.management.model;
 
+import io.omnika.services.management.model.channel.Channel;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -33,4 +34,7 @@ public class Tenant {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "tenant", cascade = CascadeType.ALL)
     private List<Manager> managers = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "tenant")
+    private List<Channel> channels = new ArrayList<>();
 }

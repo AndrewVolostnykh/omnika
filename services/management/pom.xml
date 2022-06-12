@@ -49,6 +49,12 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.omnika.common.core</groupId>
+            <artifactId>core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!--        SPRING        -->
 
         <dependency>

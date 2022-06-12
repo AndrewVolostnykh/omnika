@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-class TelegramBotChannelServiceImpl implements TelegramChannelBotService {
+public class TelegramBotChannelServiceImpl implements TelegramChannelBotService {
 
     private final ChannelRepository channelRepository;
     private final TelegramBotChannelRepository telegramBotChannelRepository;
@@ -35,5 +35,9 @@ class TelegramBotChannelServiceImpl implements TelegramChannelBotService {
 //        streamBridge.send("newTelegramChannel-in-0", result);
 
         return result;
+    }
+
+    public void produceNewChannel(TelegramBotChannelDto telegramBotChannelDto) {
+        streamBridge.send("newTelegramChannel-in-0", telegramBotChannelDto);
     }
 }

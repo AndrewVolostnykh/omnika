@@ -1,10 +1,15 @@
 package io.omnika.services.telegram.channel.service;
 
+import io.omnika.common.rest.services.channels.dto.ChannelMessageDto;
+import io.omnika.common.rest.services.channels.dto.ChannelSessionDto;
 import io.omnika.common.rest.services.management.dto.channel.TelegramBotChannelDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Slf4j
 public class BotChannelService extends TelegramLongPollingBot {
@@ -24,20 +29,40 @@ public class BotChannelService extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        Message message = update.getMessage();
+
         log.warn("Bot {} with channel id {} and tenant name {} received message\n{}",
                 getMetadata().getName(),
                 getMetadata().getId(),
                 getMetadata().getTenantDto().getName(),
-                update.getMessage().getText()
+                message.getText()
         );
 
-//        TelegramChannelBotMessageDto receivedMessage = new TelegramChannelBotMessageDto(update.getMessage().getText(), metadata);
-//
-//        Message<TelegramChannelBotMessageDto> message = MessageBuilder.withPayload(receivedMessage)
-//                .setHeader("sessionId", update.getMessage().getChatId())
-//                .build();
-//
-//        streamBridge.send("telegramBotMessage-in-0", message);
+        ChannelSessionDto channelSessionDto = new ChannelSessionDto();
+        channelSessionDto.setTenantId(getMetadata().getTenantDto().getId());
+        channelSessionDto.setChannelId(getMetadata().getId());
+        channelSessionDto.setSessionId(message.getChatId());
+        channelSessionDto.setChannelType(getMetadata().getChannelType());
+
+        ChannelMessageDto channelMessageDto = new ChannelMessageDto();
+        channelMessageDto.setText(message.getText());
+        channelMessageDto.setChannelSessionDto(channelSessionDto);
+
+        streamBridge.send("message-in-0", channelMessageDto);
+    }
+
+    public void sendMessage(ChannelMessageDto channelMessageDto) {
+        try {
+
+            log.warn("Message to send to channel [{}] with session [{}] with text [{}]",
+                    channelMessageDto.getChannelSessionDto().getChannelId(),
+                    channelMessageDto.getChannelSessionDto().getSessionId(),
+                    channelMessageDto.getText());
+
+            execute(new SendMessage(channelMessageDto.getChannelSessionDto().getSessionId().toString(), channelMessageDto.getText()));
+        } catch (TelegramApiException e) {
+            log.error("Cannot send message", e);
+        }
     }
 
     public TelegramBotChannelDto getMetadata() {

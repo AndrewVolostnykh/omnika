@@ -19,6 +19,7 @@
         <module>exceptions</module>
         <module>ipc</module>
         <module>utils</module>
+        <module>core</module>
     </modules>
 
     <dependencies>

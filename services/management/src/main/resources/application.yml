@@ -26,12 +26,13 @@ spring:
     username: ${RABBITMQ_USERNAME:guest}
     password: ${RABBITMQ_PASSWORD:guest}
 
-    cloud:
-      zookeeper:
-        connect-string: ${ZOOKEEPER_CONNECT_STRING:localhost:2181}
+  cloud:
+    zookeeper:
+      connect-string: ${ZOOKEEPER_CONNECT_STRING:localhost:2181}
 
-      function:
-        definition: getAllChannels # there can be several functions delimits with ';'
+    function:
+      definition: getAllChannels
+
 security:
   token:
     signing_key: ${SECURITY_TOKEN_SIGNING_KEY:abababa}

@@ -1,4 +1,4 @@
-package io.omnika.services.management.core.converter.mapper;
+package io.omnika.common.core.converters;
 
 /** The abstraction for mappers based on entities. It is needed to
  * standardize mappers which created exactly for model entities.
@@ -14,7 +14,7 @@ package io.omnika.services.management.core.converter.mapper;
  *
  * Generics: D = domain, T = transfer (DTO)
  * */
-public interface BasicMapper<D, T> {
+public interface BasicEntityMapper<D, T> {
 
     D toDomain(T dto);
 

@@ -31,7 +31,7 @@ class ChannelServiceImpl implements ChannelService {
     public Consumer<ChannelType> getAllChannels() {
         // FIXME: do not use hardcoded names of queues, better to use Suplier to publish message to queue
         return channelType -> {
-            log.info("Received getAllChannels event with channel type [{}]", channelType);
+            log.warn("Received getAllChannels event with channel type [{}]", channelType);
             streamBridge.send("allChannels-in-0", hibernateUtils.doInNewTransaction(() -> listByType(channelType)));
         };
     }

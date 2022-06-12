@@ -1,14 +1,17 @@
 package io.omnika.common.rest.services.channels.dto;
 
-import io.omnika.common.rest.services.management.dto.channel.ChannelDto;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class ChannelMessage<T extends ChannelDto> {
+public class ChannelMessageDto {
 
-//  private Long chatId;
+    private Long id;
     private String text;
-    private T metadata;
+    private ChannelSessionDto channelSessionDto;
 }

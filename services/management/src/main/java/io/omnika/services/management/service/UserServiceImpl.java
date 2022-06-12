@@ -42,7 +42,7 @@ class UserServiceImpl implements UserService {
 
         User user = new User();
         user.setEmail(signingDto.getEmail());
-        user.setAuthority(Authority.USER);
+        user.setAuthority(Authority.TENANT);
         user.setActive(true);
         user.setPassword(passwordEncoder.encode(signingDto.getPassword()));
 
@@ -55,7 +55,7 @@ class UserServiceImpl implements UserService {
         user.setEmail(email);
         user.setActive(false);
         user.setActivationToken(UUID.randomUUID());
-        user.setAuthority(Authority.USER);
+        user.setAuthority(Authority.MANAGER);
 
         // TODO: there sending email
         log.warn("User to activate: email [{}], token [{}]", user.getEmail(), user.getActivationToken());

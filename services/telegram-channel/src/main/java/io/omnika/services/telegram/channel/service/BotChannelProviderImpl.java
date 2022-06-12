@@ -1,5 +1,6 @@
 package io.omnika.services.telegram.channel.service;
 
+import io.omnika.common.rest.services.channels.dto.ChannelMessageDto;
 import io.omnika.common.rest.services.management.dto.channel.TelegramBotChannelDto;
 import io.omnika.common.rest.services.management.model.ChannelType;
 import io.omnika.services.telegram.channel.core.service.BotChannelProvider;
@@ -48,17 +49,22 @@ public class BotChannelProviderImpl implements BotChannelProvider {
         return channels -> channels.forEach(channel -> {
             // FIXME: remove id
             // TODO: cover it with async processing, but not just for each
-            log.warn("Channel received. Name [{}], channel id [{}], tenant name [{}]", channel.getName(), channel.getId(), channel.getTenantDto().getName());
+            log.warn("[ALL CHANNELS EVENT] Channel received. Name [{}], channel id [{}], tenant name [{}]", channel.getName(), channel.getId(), channel.getTenantDto().getName());
             createBot(channel);
         });
     }
 
-//    @Bean
+    @Bean
     public Consumer<TelegramBotChannelDto> newTelegramChannel() {
         return channel -> {
-            log.warn("New channel received. Bot [{}], channel id [{}], tenant name [{}]", channel.getName(), channel.getId(), channel.getTenantDto().getName());
+            log.warn("[NEW CHANNEL EVENT] New channel received. Bot [{}], channel id [{}], tenant name [{}]", channel.getName(), channel.getId(), channel.getTenantDto().getName());
             createBot(channel);
         };
+    }
+
+    @Bean
+    public Consumer<ChannelMessageDto> toTelegramChannelMessage() {
+        return message -> bots.get(message.getChannelSessionDto().getChannelId()).sendMessage(message);
     }
 
     @SneakyThrows
@@ -86,7 +92,6 @@ public class BotChannelProviderImpl implements BotChannelProvider {
                 log.error("Exception on stopping channel", e);
             }
         });
-
     }
 
     public List<TelegramBotChannelDto> list() {

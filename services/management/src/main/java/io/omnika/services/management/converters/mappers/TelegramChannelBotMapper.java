@@ -1,14 +1,14 @@
 package io.omnika.services.management.converters.mappers;
 
+import io.omnika.common.core.converters.BasicEntityMapper;
 import io.omnika.common.rest.services.management.dto.channel.TelegramBotChannelDto;
-import io.omnika.services.management.core.converter.mapper.BasicMapper;
 import io.omnika.services.management.model.channel.TelegramBotChannel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
-public interface TelegramChannelBotMapper extends BasicMapper<TelegramBotChannel, TelegramBotChannelDto> {
+public interface TelegramChannelBotMapper extends BasicEntityMapper<TelegramBotChannel, TelegramBotChannelDto> {
 
     TelegramChannelBotMapper INSTANCE = Mappers.getMapper(TelegramChannelBotMapper.class);
 

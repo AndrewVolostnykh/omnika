@@ -1,5 +1,6 @@
 package io.omnika.services.management.converters;
 
+import io.omnika.common.core.converters.AbstractBasicEntityConverter;
 import io.omnika.common.exceptions.ObjectNotFoundException;
 import io.omnika.common.rest.services.management.dto.channel.ChannelDto;
 import io.omnika.services.management.converters.mappers.ChannelMapper;
@@ -11,7 +12,7 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ChannelConverter extends AbstractBasicConverter<Channel, ChannelDto> {
+public class ChannelConverter extends AbstractBasicEntityConverter<Channel, ChannelDto> {
 
     private final TelegramBotChannelRepository telegramBotChannelRepository;
     private final TelegramBotChannelConverter telegramBotChannelConverter;

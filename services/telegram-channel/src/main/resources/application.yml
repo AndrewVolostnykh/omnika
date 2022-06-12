@@ -20,10 +20,10 @@ spring:
     username: ${RABBITMQ_USERNAME:guest}
     password: ${RABBITMQ_PASSWORD:guest}
 
-    ### it doesn't works for several consumers
-  function:
-    definition: allChannels
-
+  ### it doesn't works for several consumers
   cloud:
+    function:
+      definition: allChannels;newTelegramChannel;toTelegramChannelMessage
+
     zookeeper:
       connect-string: ${ZOOKEEPER_CONNECT_STRING:localhost:2181}

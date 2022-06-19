@@ -7,6 +7,7 @@ import io.omnika.common.security.model.Authority;
 import io.omnika.common.security.model.UserPrincipal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.Getter;
@@ -38,8 +39,9 @@ public class TokenServiceImpl implements TokenService {
                 .setSigningKey(tokenSigningKey)
                 .parseClaimsJws(token).getBody();
 
-        Long userId = claims.get(USER_ID_CLAIM, Long.class);
+        UUID userId = UUID.fromString(claims.get(USER_ID_CLAIM, String.class));
         String email = claims.get(USER_EMAIL_CLAIM, String.class);
+        UUID tenantId = UUID.fromString(claims.get(TENANT_ID_CLAIM, String.class));
         Authority accountAuthority = Authority.valueOf(claims.get(AUTHORITY_CLAIM, String.class));
 
         List<GrantedAuthority> authorities = Arrays.stream(Authority.values())
@@ -50,6 +52,7 @@ public class TokenServiceImpl implements TokenService {
         UserPrincipal principal = new UserPrincipal();
         principal.setUserId(userId);
         principal.setEmail(email);
+        principal.setTenantId(tenantId);
         principal.setAuthorities(authorities);
         principal.setToken(token);
         return principal;

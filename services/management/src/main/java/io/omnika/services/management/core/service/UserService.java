@@ -2,21 +2,27 @@ package io.omnika.services.management.core.service;
 
 import io.omnika.common.rest.services.management.dto.UserDto;
 import io.omnika.common.rest.services.management.dto.auth.SetPasswordDto;
+import io.omnika.common.rest.services.management.dto.auth.SignUpDto;
 import io.omnika.common.rest.services.management.dto.auth.SigningDto;
 import io.omnika.common.rest.services.management.dto.auth.TokenDto;
+import io.omnika.common.rest.services.management.dto.manager.CreateManagerDto;
 import java.util.UUID;
 
 public interface UserService {
 
-    TokenDto signUp(SigningDto signingDto);
+    void signUp(SignUpDto signUpDto);
+
+    void signUpManager(UUID tenantId, CreateManagerDto createManagerDto);
 
     TokenDto login(SigningDto signingDto);
 
-    UserDto get(Long id);
+//    UserDto get(Long id);
+//
+//    UserDto createNeedActivation(String email);
 
-    UserDto createNeedActivation(String email);
+    TokenDto activate(UUID activationToken);
 
-    TokenDto activate(UUID activationToken, SetPasswordDto setPasswordDto);
+    TokenDto setPassword(UUID activationToken, SetPasswordDto setPasswordDto);
 
     UserDto getCurrent();
 }

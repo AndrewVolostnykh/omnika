@@ -21,6 +21,7 @@ class TokenService extends TokenServiceImpl {
                 .claim(USER_ID_CLAIM, user.getId())
                 .claim(USER_EMAIL_CLAIM, user.getEmail())
                 .claim(AUTHORITY_CLAIM, user.getAuthority())
+                .claim(TENANT_ID_CLAIM, user.getTenant().getId())
                 .signWith(SignatureAlgorithm.HS512, tokenSigningKey)
                 .compact();
     }

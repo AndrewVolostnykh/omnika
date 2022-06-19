@@ -1,0 +1,37 @@
+project:
+  title: Omnika Messaging Gateway Service
+
+server:
+  port: ${SERVER_PORT:8083}
+
+spring:
+  application:
+    name: messaging-gateway-service
+
+  datasource:
+    #    driver-class-name: org.postgresql.Driver
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/omnika-messaging-gateway-service}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: ${HIBERNATE_DDL_MODE:update}
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+  cloud:
+    zookeeper:
+      connect-string: ${ZOOKEEPER_CONNECT_STRING:localhost:2181}
+
+    function:
+      definition: message
+
+security:
+  token:
+    signing_key: ${SECURITY_TOKEN_SIGNING_KEY:abababa}
+    lifetime: ${SECURITY_TOKEN_LIFETIME:86400}  # 24 hours by default
+    request_header: ${SECURITY_TOKEN_REQUEST_HEADER:X-Authorization}

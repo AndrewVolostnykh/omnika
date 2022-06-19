@@ -17,8 +17,21 @@ spring:
     hibernate:
       ddl-auto: ${HIBERNATE_DDL_MODE:update}
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:db/migration/common
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+  cloud:
+    zookeeper:
+      connect-string: ${ZOOKEEPER_CONNECT_STRING:localhost:2181}
+
+    function:
+      definition: getAllChannels
 
 security:
   token:

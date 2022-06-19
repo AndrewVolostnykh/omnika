@@ -10,6 +10,8 @@ import io.omnika.common.exceptions.ValidationException;
 import io.omnika.common.exceptions.WithDescriptionError;
 import io.omnika.common.exceptions.auth.IncorrectPasswordException;
 import io.omnika.common.exceptions.auth.UserNotFoundException;
+import io.omnika.common.security.model.UserPrincipal;
+import io.omnika.common.security.utils.AuthenticationHelper;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
@@ -57,4 +59,11 @@ public class BaseController {
     public ResponseEntity<List<FieldValueError>> handleObjectNotFoundException(ObjectNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getRequestParams());
     }
+
+    /** Query user principal from token. Recommended to use
+     * with {@link org.springframework.security.access.prepost.PreAuthorize} annotation */
+    public UserPrincipal getPrincipal() {
+        return AuthenticationHelper.getAuthenticationDetails();
+    }
+
 }

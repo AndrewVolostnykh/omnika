@@ -10,7 +10,6 @@
     <modules>
         <module>common</module>
         <module>services</module>
-        <module>utils</module>
     </modules>
 
     <parent>
@@ -30,6 +29,8 @@
         <spring-test.version>2.5.0</spring-test.version>
         <h2db.version>2.1.212</h2db.version>
         <junit.vintage.version>5.8.2</junit.vintage.version>
+        <telegram-bots.version>5.7.1</telegram-bots.version>
+        <hibernate-types-52.version>2.7.1</hibernate-types-52.version>
     </properties>
 
     <packaging>pom</packaging>
@@ -50,7 +51,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+
                 <!-- OMNIKA DEPENDENCIES -->
+
                 <groupId>io.omnika.common.security-starter</groupId>
                 <artifactId>security-starter</artifactId>
                 <version>${project.version}</version>
@@ -77,6 +80,12 @@
             <dependency>
                 <groupId>io.omnika.common.exceptions</groupId>
                 <artifactId>exceptions</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.omnika.common.ipc</groupId>
+                <artifactId>ipc</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -116,6 +125,18 @@
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
                 <version>${jjwt.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.telegram</groupId>
+                <artifactId>telegrambots-spring-boot-starter</artifactId>
+                <version>${telegram-bots.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.vladmihalcea</groupId>
+                <artifactId>hibernate-types-52</artifactId>
+                <version>${hibernate-types-52.version}</version>
             </dependency>
 
             <!-- TESTS -->

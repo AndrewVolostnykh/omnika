@@ -27,6 +27,7 @@
             <artifactId>security-starter</artifactId>
         </dependency>
 
+        <!--!can be removed!-->
         <dependency>
             <groupId>io.omnika.common</groupId>
             <artifactId>common</artifactId>
@@ -35,6 +36,23 @@
         <dependency>
             <groupId>io.omnika.common.rest</groupId>
             <artifactId>rest</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.omnika.common.ipc</groupId>
+            <artifactId>ipc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.omnika.common.utils</groupId>
+            <artifactId>utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.omnika.common.core</groupId>
+            <artifactId>core</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!--        SPRING        -->
@@ -80,6 +98,11 @@
         </dependency>
 
         <!--        LIBS        -->
+
+        <dependency>
+            <groupId>com.vladmihalcea</groupId>
+            <artifactId>hibernate-types-52</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Ignore;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.runner.RunWith;
@@ -35,6 +36,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+@Ignore
+// TODO: WARNING! Do not remove this test, it is nice example
+// to rewrite when MVP will be ready
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ManagementApplication.class)

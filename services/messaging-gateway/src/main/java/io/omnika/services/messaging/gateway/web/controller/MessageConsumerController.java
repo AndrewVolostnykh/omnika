@@ -1,11 +1,13 @@
 package io.omnika.services.messaging.gateway.web.controller;
 
 import io.omnika.common.rest.services.channels.dto.ChannelMessageDto;
+import io.omnika.services.messaging.gateway.core.aspect.SendToStream;
 import io.omnika.services.messaging.gateway.service.MessageConsumerServiceImpl;
 import io.omnika.services.messaging.gateway.service.MessageProducerServiceImpl;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,5 +36,11 @@ public class MessageConsumerController {
     @PostMapping
     public ChannelMessageDto sendMessage(@RequestBody ChannelMessageDto channelMessageDto) {
         return messageProducerService.send(channelMessageDto);
+    }
+
+    @GetMapping("/test/{toSend}")
+    @SendToStream(exchange = "test-in-0")
+    public String test(@PathVariable String toSend) {
+        return toSend;
     }
 }

@@ -1,26 +1,22 @@
 package io.omnika.common.security.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.omnika.common.security.core.service.TokenService;
-import io.omnika.common.security.exception.ProcessingTokenException;
 import io.omnika.common.security.model.UserPrincipal;
 import java.io.IOException;
-import java.io.OutputStream;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RequestFilter extends OncePerRequestFilter {
@@ -37,12 +33,14 @@ public class RequestFilter extends OncePerRequestFilter {
             try {
                 principal = tokenService.parseToken(token);
             } catch (Exception e) {
-                try (OutputStream outputStream = response.getOutputStream()) {
-                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                    new ObjectMapper().writeValue(outputStream, new ProcessingTokenException(ExceptionUtils.getMessage(e)));
-                    response.setStatus(HttpStatus.FORBIDDEN.value());
-                    return;
-                }
+//                try (OutputStream outputStream = response.getOutputStream()) {
+//                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+//                    new ObjectMapper().writeValue(outputStream, new ProcessingTokenException(ExceptionUtils.getMessage(e)));
+//                    response.setStatus(HttpStatus.FORBIDDEN.value());
+//                    return;
+//                }
+                log.error("Error on processing auth token occurred", e);
+                return;
             }
             authentication = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         }

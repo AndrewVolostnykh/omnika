@@ -13,7 +13,4 @@ public class CreateManagerDto {
     @NotNull(message = Validation.EMAIL_REQUIRED)
     @Email(message = Validation.INVALID_EMAIL_PATTERN)
     private String email;
-
-    @NotNull
-    private Long tenantId;
 }

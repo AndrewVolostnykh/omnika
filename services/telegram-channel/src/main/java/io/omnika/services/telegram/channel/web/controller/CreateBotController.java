@@ -1,6 +1,6 @@
 package io.omnika.services.telegram.channel.web.controller;
 
-import io.omnika.common.rest.services.management.dto.channel.TelegramBotChannelDto;
+import io.omnika.common.rest.services.management.dto.channel.TelegramBotChannelConfig;
 import io.omnika.services.telegram.channel.core.service.BotChannelProvider;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+// only for testing controller
 @RestController
 @RequiredArgsConstructor
 public class CreateBotController {
@@ -20,16 +21,16 @@ public class CreateBotController {
     private final DiscoveryClient discoveryClient;
 
     @PostMapping
-    public void createBot(@RequestBody TelegramBotChannelDto telegramBotChannelDto) {
+    public void createBot(@RequestBody TelegramBotChannelConfig telegramBotChannelDto) {
 
-        botChannelProvider.createBot(telegramBotChannelDto);
+//        botChannelProvider.createBot(telegramBotChannelDto);
 
     }
 
-    @GetMapping
-    public List<TelegramBotChannelDto> list() {
-        return botChannelProvider.list();
-    }
+//    @GetMapping
+//    public List<TelegramBotChannelConfig> list() {
+////        return botChannelProvider.list();
+//    }
 
     @GetMapping("/discovery/info")
     public DiscoveryInfo getDiscoveryInfo() {

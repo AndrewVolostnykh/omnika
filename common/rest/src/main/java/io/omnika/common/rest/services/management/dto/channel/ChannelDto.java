@@ -1,29 +1,35 @@
 package io.omnika.common.rest.services.management.dto.channel;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import io.omnika.common.rest.services.management.dto.TenantDto;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.omnika.common.rest.services.management.model.ChannelType;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "channelType", visible = true)
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = TelegramBotChannelDto.class, name = "TELEGRAM_BOT"),
-        @JsonSubTypes.Type(value = ViberBotChannelDto.class, name = "VIBER_BOT")
-})
 public class ChannelDto {
 
-    protected Long id;
+    private UUID id;
 
     @NotNull
-    protected String name;
+    private String name;
 
-    protected ChannelType channelType;
+    // TODO: think about it. It is duplicate in config and here. Should it be?
+    @NotNull
+    private ChannelType channelType;
 
-    protected TenantDto tenantDto;
+    private UUID tenantId;
+
+    @Valid
+    @NotNull
+    private ChannelConfig config;
+
+    private LocalDateTime createdTime;
+
+    private LocalDateTime updateTime;
+
+    private JsonNode metadata;
 
 }

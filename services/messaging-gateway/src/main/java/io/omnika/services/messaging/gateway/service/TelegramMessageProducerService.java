@@ -6,7 +6,7 @@ import io.omnika.services.messaging.gateway.converter.ChannelMessageConverter;
 import io.omnika.services.messaging.gateway.core.MessageProducer;
 import io.omnika.services.messaging.gateway.model.ChannelMessage;
 import io.omnika.services.messaging.gateway.repository.ChannelMessageRepository;
-import io.omnika.services.messaging.gateway.repository.SessionRepository;
+import io.omnika.services.messaging.gateway.repository.ChannelSessionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 public class TelegramMessageProducerService implements MessageProducer {
 
     private final StreamBridge streamBridge;
-    private final SessionRepository sessionRepository;
+    private final ChannelSessionRepository channelSessionRepository;
     private final ChannelMessageRepository channelMessageRepository;
     private final ChannelMessageConverter channelMessageConverter;
 
@@ -28,10 +28,11 @@ public class TelegramMessageProducerService implements MessageProducer {
         ChannelMessage channelMessage = channelMessageConverter.toDomain(channelMessageDto);
 
         // TODO: cache
-        if (sessionRepository.existsBySessionIdAndChannelId(channelMessageDto.getChannelSessionDto().getSessionId(), channelMessageDto.getChannelSessionDto().getChannelId())) {
-            channelMessage.setChannelSession(sessionRepository.getById(channelMessageDto.getChannelSessionDto().getId()));
+        if (channelSessionRepository
+                .existsBySessionIdAndChannelId(channelMessageDto.getChannelSessionDto().getSessionId(), channelMessageDto.getChannelSessionDto().getChannelId())) {
+            channelMessage.setChannelSession(channelSessionRepository.getById(channelMessageDto.getChannelSessionDto().getId()));
         } else {
-            sessionRepository.save(channelMessage.getChannelSession());
+            channelSessionRepository.save(channelMessage.getChannelSession());
         }
 
         ChannelMessage saved = channelMessageRepository.save(channelMessage);

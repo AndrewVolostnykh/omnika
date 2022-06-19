@@ -7,15 +7,20 @@ import io.omnika.common.exceptions.ObjectNotFoundException;
 import io.omnika.common.exceptions.ValidationException;
 import io.omnika.common.exceptions.auth.IncorrectPasswordException;
 import io.omnika.common.exceptions.auth.UserNotFoundException;
+import io.omnika.common.rest.services.management.dto.TenantDto;
 import io.omnika.common.rest.services.management.dto.UserDto;
 import io.omnika.common.rest.services.management.dto.auth.SetPasswordDto;
+import io.omnika.common.rest.services.management.dto.auth.SignUpDto;
 import io.omnika.common.rest.services.management.dto.auth.SigningDto;
 import io.omnika.common.rest.services.management.dto.auth.TokenDto;
+import io.omnika.common.rest.services.management.dto.manager.CreateManagerDto;
 import io.omnika.common.security.model.Authority;
 import io.omnika.common.security.model.UserPrincipal;
 import io.omnika.common.security.utils.AuthenticationHelper;
 import io.omnika.services.management.converters.UserConverter;
+import io.omnika.services.management.core.service.TenantService;
 import io.omnika.services.management.core.service.UserService;
+import io.omnika.services.management.model.Tenant;
 import io.omnika.services.management.model.User;
 import io.omnika.services.management.repository.UserRepository;
 import java.util.UUID;
@@ -33,34 +38,55 @@ class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserConverter userConverter;
+    private final TenantService tenantService;
 
     @Override
-    public TokenDto signUp(SigningDto signingDto) {
-        if (userRepository.existsByEmail(signingDto.getEmail())) {
+    public void signUp(SignUpDto signUpDto) {
+        if (userRepository.existsByEmail(signUpDto.getEmail())) {
+            // FIXME: remove this code duplication. U can use custom validators for checking
+            // email for uniq
+            throw new ValidationException(FieldError.builder().field("email").code(Validation.NOT_UNIQUE).build());
+        }
+
+        TenantDto tenant = new TenantDto();
+        tenant.setName(signUpDto.getTenantName());
+        tenant = tenantService.create(tenant);
+
+        User user = new User();
+        user.setEmail(signUpDto.getEmail());
+        user.setAuthority(Authority.TENANT_ADMIN);
+        user.setActive(false);
+        user.setActivationToken(UUID.randomUUID());
+        user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
+        user.setTenant(new Tenant(tenant.getId()));
+        userRepository.save(user);
+
+        // here will be sent activation link
+        log.warn("Activation of tenant admin [{}]. Use this token: [{}]", signUpDto.getEmail(), user.getActivationToken());
+
+//        return new TokenDto(tokenService.createToken(userRepository.save(user)));
+    }
+
+    @Override
+    public void signUpManager(UUID tenantId, CreateManagerDto createManagerDto) {
+        // FIXME: remove this code duplication. U can use custom validators for checking
+        // email for uniq
+        if (userRepository.existsByEmail(createManagerDto.getEmail())) {
             throw new ValidationException(FieldError.builder().field("email").code(Validation.NOT_UNIQUE).build());
         }
 
         User user = new User();
-        user.setEmail(signingDto.getEmail());
-        user.setAuthority(Authority.TENANT);
-        user.setActive(true);
-        user.setPassword(passwordEncoder.encode(signingDto.getPassword()));
-
-        return new TokenDto(tokenService.createToken(userRepository.save(user)));
-    }
-
-    @Override
-    public UserDto createNeedActivation(String email) {
-        User user = new User();
-        user.setEmail(email);
+        user.setEmail(createManagerDto.getEmail());
         user.setActive(false);
-        user.setActivationToken(UUID.randomUUID());
+        user.setTenant(new Tenant(tenantId));
         user.setAuthority(Authority.MANAGER);
+        user.setName(createManagerDto.getName());
+        user.setActivationToken(UUID.randomUUID());
 
-        // TODO: there sending email
-        log.warn("User to activate: email [{}], token [{}]", user.getEmail(), user.getActivationToken());
+        userRepository.save(user);
 
-        return userConverter.toDto(userRepository.save(user));
+        // here will be sent password setting link
+        log.warn("Activating manager [{}]. User this token to activate and set pass [{}]", user.getEmail(), user.getActivationToken());
     }
 
     @Override
@@ -69,7 +95,7 @@ class UserServiceImpl implements UserService {
                 .orElseThrow(UserNotFoundException::new);
 
         if (!user.isActive()) {
-            // it should not be validation, but authentication
+            // FIXME: it should not be validation, but authentication
             throw new ValidationException(Auth.USER_NOT_ACTIVE);
         }
 
@@ -80,8 +106,22 @@ class UserServiceImpl implements UserService {
         }
     }
 
-    public TokenDto activate(UUID activationToken, SetPasswordDto setPasswordDto) {
+    @Override
+    public TokenDto activate(UUID activationToken) {
         User user = userRepository.findByActivationToken(activationToken).orElseThrow(UserNotFoundException::new);
+        user.setActive(true);
+        user = userRepository.save(user);
+
+        return new TokenDto(tokenService.createToken(user));
+    }
+
+    @Override
+    public TokenDto setPassword(UUID activationToken, SetPasswordDto setPasswordDto) {
+        User user = userRepository.findByActivationToken(activationToken).orElseThrow(UserNotFoundException::new);
+
+        // validation for can user set password if it allready present
+        // I mean on tenant activation we sending link with only token,
+        // but what if user will use endpoint for token and password?
 
         user.setPassword(passwordEncoder.encode(setPasswordDto.getPassword()));
         user.setActive(true);
@@ -90,14 +130,14 @@ class UserServiceImpl implements UserService {
         return new TokenDto(tokenService.createToken(userRepository.save(user)));
     }
 
-    @Override
-    public UserDto get(Long id) {
-        return userConverter.toDto(
-                userRepository.findById(id)
-                        .orElseThrow(() -> new ObjectNotFoundException(id, User.class))
-        );
-    }
-
+//    @Override
+//    public UserDto get(Long id) {
+//        return userConverter.toDto(
+//                userRepository.findById(id)
+//                        .orElseThrow(() -> new ObjectNotFoundException(id, User.class))
+//        );
+//    }
+//
     @Override
     public UserDto getCurrent() {
         UserPrincipal userPrincipal = AuthenticationHelper.getAuthenticationDetails();

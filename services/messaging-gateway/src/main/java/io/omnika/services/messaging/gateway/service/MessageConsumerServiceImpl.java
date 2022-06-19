@@ -6,7 +6,7 @@ import io.omnika.services.messaging.gateway.converter.ChannelMessageConverter;
 import io.omnika.services.messaging.gateway.model.ChannelMessage;
 import io.omnika.services.messaging.gateway.model.ChannelSession;
 import io.omnika.services.messaging.gateway.repository.ChannelMessageRepository;
-import io.omnika.services.messaging.gateway.repository.SessionRepository;
+import io.omnika.services.messaging.gateway.repository.ChannelSessionRepository;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -21,10 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MessageConsumerServiceImpl {
 
-    private final SessionRepository sessionRepository;
+    private final ChannelSessionRepository channelSessionRepository;
     private final ChannelMessageRepository channelMessageRepository;
     private final ChannelMessageConverter channelMessageConverter;
 
+    // WARNING! If we will throw message in time of messaging gateway starting up
+    // it will not process this message, only new received after start up
     @Bean
     public Consumer<ChannelMessageDto> message() {
         return message -> {
@@ -39,13 +41,15 @@ public class MessageConsumerServiceImpl {
             // there should be used some cache, because on every message not so
             // efficient to go to DB and check for a session presents
             // FIXME: exists by id and channel id
-            if (sessionRepository.existsBySessionIdAndChannelId(message.getChannelSessionDto().getSessionId(), message.getChannelSessionDto().getChannelId())) {
-                channelSession = sessionRepository.findBySessionIdAndChannelId(message.getChannelSessionDto().getSessionId(), message.getChannelSessionDto().getChannelId())
+            if (channelSessionRepository
+                    .existsBySessionIdAndChannelId(message.getChannelSessionDto().getSessionId(), message.getChannelSessionDto().getChannelId())) {
+                channelSession = channelSessionRepository
+                        .findBySessionIdAndChannelId(message.getChannelSessionDto().getSessionId(), message.getChannelSessionDto().getChannelId())
                         .orElseThrow(() -> new ObjectNotFoundException(message.getChannelSessionDto().getSessionId(), ChannelSession.class));
 
                 channelMessage.setChannelSession(channelSession);
             } else {
-                sessionRepository.save(channelMessage.getChannelSession());
+                channelSessionRepository.save(channelMessage.getChannelSession());
             }
 
             channelMessageRepository.save(channelMessage);

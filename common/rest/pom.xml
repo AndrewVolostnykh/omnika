@@ -20,6 +20,11 @@
         </dependency>
 
         <dependency>
+            <groupId>io.omnika.common.security-starter</groupId>
+            <artifactId>security-starter</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>io.omnika.common.exceptions</groupId>
             <artifactId>exceptions</artifactId>
         </dependency>

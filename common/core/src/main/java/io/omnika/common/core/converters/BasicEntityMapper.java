@@ -19,4 +19,5 @@ public interface BasicEntityMapper<D, T> {
     D toDomain(T dto);
 
     T toDto(D domain);
+
 }

@@ -10,10 +10,9 @@ import io.omnika.common.rest.services.management.dto.TenantDto;
 import io.omnika.common.rest.services.management.dto.UserDto;
 import io.omnika.common.rest.services.management.dto.auth.SetPasswordDto;
 import io.omnika.common.rest.services.management.dto.auth.TokenDto;
-import io.omnika.common.rest.services.management.dto.channel.TelegramBotChannelDto;
+import io.omnika.common.rest.services.management.dto.channel.TelegramBotChannelConfig;
 import io.omnika.common.rest.services.management.dto.manager.CreateManagerDto;
 import io.omnika.common.rest.services.management.dto.manager.ManagerDto;
-import io.omnika.common.rest.services.management.model.ChannelType;
 import io.omnika.services.management.AbstractIntegrationTest;
 import io.omnika.services.management.model.User;
 import java.util.List;
@@ -47,7 +46,7 @@ class BasicScenariosTest extends AbstractIntegrationTest {
 
         TenantDto tenantDto = new TenantDto();
         tenantDto.setName(testTenantName);
-        tenantDto.setUser(currentUser);
+//        tenantDto.setUser(currentUser);
         TenantDto createdTenant = createTenant(tenantDto, token);
 
         assertNotNull(createdTenant);
@@ -61,7 +60,7 @@ class BasicScenariosTest extends AbstractIntegrationTest {
         CreateManagerDto createManagerDto = new CreateManagerDto();
         createManagerDto.setEmail(testManagerEmail);
         createManagerDto.setName("Manager");
-        createManagerDto.setTenantId(createdTenant.getId());
+//        createManagerDto.setTenantId(createdTenant.getId());
 
         ManagerDto managerDto = createManager(createManagerDto, token);
 
@@ -96,14 +95,14 @@ class BasicScenariosTest extends AbstractIntegrationTest {
         List<TenantDto> userTenants = listTenants(token);
         TenantDto tenantDto = userTenants.get(0);
 
-        TelegramBotChannelDto telegramBotChannelDto = new TelegramBotChannelDto();
-        telegramBotChannelDto.setTenantDto(tenantDto);
-        telegramBotChannelDto.setName(telegramChannelName);
-        telegramBotChannelDto.setChannelType(ChannelType.TELEGRAM_BOT);
+        TelegramBotChannelConfig telegramBotChannelDto = new TelegramBotChannelConfig();
+//        telegramBotChannelDto.setTenantDto(tenantDto);
+//        telegramBotChannelDto.setName(telegramChannelName);
+//        telegramBotChannelDto.setChannelType(ChannelType.TELEGRAM_BOT);
         telegramBotChannelDto.setBotName(botName);
         telegramBotChannelDto.setApiKey(apiKey);
 
-        TelegramBotChannelDto telegramBotChannel = createTelegramBotChannel(telegramBotChannelDto, token);
+        TelegramBotChannelConfig telegramBotChannel = createTelegramBotChannel(telegramBotChannelDto, token);
 
         assertNotNull(telegramBotChannel);
         // TODO: check list of tenant's channels

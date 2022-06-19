@@ -2,7 +2,8 @@ package io.omnika.services.telegram.channel.service;
 
 import io.omnika.common.rest.services.channels.dto.ChannelMessageDto;
 import io.omnika.common.rest.services.channels.dto.ChannelSessionDto;
-import io.omnika.common.rest.services.management.dto.channel.TelegramBotChannelDto;
+import io.omnika.common.rest.services.management.dto.channel.ChannelDto;
+import io.omnika.common.rest.services.management.dto.channel.TelegramBotChannelConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -14,16 +15,16 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Slf4j
 public class BotChannelService extends TelegramLongPollingBot {
 
-    private final TelegramBotChannelDto metadata;
+    private final ChannelDto metadata;
     private final String botName;
     private final String apiKey;
     private final StreamBridge streamBridge;
 
-    public BotChannelService(TelegramBotChannelDto metadata, StreamBridge streamBridge) {
+    public BotChannelService(ChannelDto metadata, StreamBridge streamBridge) {
         super();
         this.metadata = metadata;
-        this.botName = metadata.getBotName();
-        this.apiKey = metadata.getApiKey();
+        this.botName = ((TelegramBotChannelConfig) metadata.getConfig()).getBotName();
+        this.apiKey = ((TelegramBotChannelConfig) metadata.getConfig()).getApiKey();
         this.streamBridge = streamBridge;
     }
 
@@ -34,12 +35,12 @@ public class BotChannelService extends TelegramLongPollingBot {
         log.warn("Bot {} with channel id {} and tenant name {} received message\n{}",
                 getMetadata().getName(),
                 getMetadata().getId(),
-                getMetadata().getTenantDto().getName(),
+                getMetadata().getTenantId(),
                 message.getText()
         );
 
         ChannelSessionDto channelSessionDto = new ChannelSessionDto();
-        channelSessionDto.setTenantId(getMetadata().getTenantDto().getId());
+        channelSessionDto.setTenantId(getMetadata().getTenantId());
         channelSessionDto.setChannelId(getMetadata().getId());
         channelSessionDto.setSessionId(message.getChatId());
         channelSessionDto.setChannelType(getMetadata().getChannelType());
@@ -65,7 +66,7 @@ public class BotChannelService extends TelegramLongPollingBot {
         }
     }
 
-    public TelegramBotChannelDto getMetadata() {
+    public ChannelDto getMetadata() {
         return this.metadata;
     }
 

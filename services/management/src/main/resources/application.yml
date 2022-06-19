@@ -17,7 +17,7 @@ spring:
     hibernate:
       ddl-auto: ${HIBERNATE_DDL_MODE:update}
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:db/migration/common
 
   rabbitmq:

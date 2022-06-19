@@ -15,5 +15,4 @@ public class MessageProducerServiceImpl {
                 .send(channelMessageDto);
     }
 
-
 }

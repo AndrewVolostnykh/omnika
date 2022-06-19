@@ -1,40 +1,33 @@
 package io.omnika.services.management.model;
 
+import io.omnika.services.management.core.model.BaseEntity;
 import io.omnika.services.management.model.channel.Channel;
-import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.CascadeType;
+import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "tenants")
-@NoArgsConstructor
-public class Tenant {
+public class Tenant extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    public Tenant(UUID id) {
+        this.setId(id);
+    }
 
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "tenant", cascade = CascadeType.ALL)
-    private List<Manager> managers = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "tenant")
+    private List<User> users;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "tenant")
-    private List<Channel> channels = new ArrayList<>();
+    private List<Channel> channels;
 }

@@ -3,7 +3,7 @@ version: '2.2'
 services:
   zookeeper:
     image: zookeeper:3.5.9
-    container_name: ababook_zookeeper
+    container_name: zookeeper
     restart: always
     ports:
       - '2181:2181'
@@ -11,7 +11,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.8.27-management-alpine
-    container_name: ababook_rabbitmq
+    container_name: rabbitmq
     restart: always
     ports:
       - '15672'

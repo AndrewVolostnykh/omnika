@@ -1,40 +1,27 @@
 package io.omnika.services.messaging.gateway.model;
 
 import io.omnika.common.rest.services.management.model.ChannelType;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "channel_sessions")
-public class ChannelSession {
+public class ChannelSession extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long sessionId; // should it have name like entity + id? Also interesting how it will work with viber/instagram
 
-    private Long sessionId;
+    private UUID channelId;
 
-    private Long channelId;
-
-    private Long tenantId;
+    private UUID tenantId;
 
     @Enumerated(EnumType.STRING)
     private ChannelType channelType;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "channelSession")
-    private List<ChannelMessage> messages = new ArrayList<>();
 
 }

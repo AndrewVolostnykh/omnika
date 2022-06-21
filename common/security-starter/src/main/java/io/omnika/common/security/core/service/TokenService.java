@@ -12,5 +12,4 @@ public interface TokenService {
     String extractToken(HttpServletRequest servletRequest);
 
     UserPrincipal parseToken(String token);
-
 }

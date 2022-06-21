@@ -4,8 +4,8 @@ import io.omnika.common.rest.services.channels.dto.ChannelMessageDto;
 import io.omnika.common.rest.services.channels.dto.ChannelSessionDto;
 import io.omnika.common.rest.services.management.dto.channel.ChannelDto;
 import io.omnika.common.rest.services.management.dto.channel.TelegramBotChannelConfig;
+import io.omnika.services.telegram.channel.service.saga.SendMessageToGatewaySaga;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.function.StreamBridge;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -18,26 +18,19 @@ public class BotChannelService extends TelegramLongPollingBot {
     private final ChannelDto metadata;
     private final String botName;
     private final String apiKey;
-    private final StreamBridge streamBridge;
+    private final SendMessageToGatewaySaga sendMessageToGatewaySaga;
 
-    public BotChannelService(ChannelDto metadata, StreamBridge streamBridge) {
+    public BotChannelService(ChannelDto metadata, SendMessageToGatewaySaga sendMessageToGatewaySaga) {
         super();
         this.metadata = metadata;
         this.botName = ((TelegramBotChannelConfig) metadata.getConfig()).getBotName();
         this.apiKey = ((TelegramBotChannelConfig) metadata.getConfig()).getApiKey();
-        this.streamBridge = streamBridge;
+        this.sendMessageToGatewaySaga = sendMessageToGatewaySaga;
     }
 
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
-
-        log.warn("Bot {} with channel id {} and tenant name {} received message\n{}",
-                getMetadata().getName(),
-                getMetadata().getId(),
-                getMetadata().getTenantId(),
-                message.getText()
-        );
 
         ChannelSessionDto channelSessionDto = new ChannelSessionDto();
         channelSessionDto.setTenantId(getMetadata().getTenantId());
@@ -49,7 +42,16 @@ public class BotChannelService extends TelegramLongPollingBot {
         channelMessageDto.setText(message.getText());
         channelMessageDto.setChannelSessionDto(channelSessionDto);
 
-        streamBridge.send("message-in-0", channelMessageDto);
+        ChannelMessageDto sentMessage = sendMessageToGatewaySaga.send(channelMessageDto);
+
+        // TODO: change to TRACE
+        log.warn(
+                "Sent message: text [{}], tenant id [{}], channel id [{}], session id [{}]",
+                sentMessage.getText(),
+                sentMessage.getChannelSessionDto().getTenantId(),
+                sentMessage.getChannelSessionDto().getChannelId(),
+                sentMessage.getChannelSessionDto().getSessionId()
+        );
     }
 
     public void sendMessage(ChannelMessageDto channelMessageDto) {

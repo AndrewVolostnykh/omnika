@@ -1,9 +1,11 @@
 package io.omnika.services.telegram.channel.service;
 
+import io.omnika.common.ipc.streams.SendToStream;
 import io.omnika.common.rest.services.channels.dto.ChannelMessageDto;
 import io.omnika.common.rest.services.management.dto.channel.ChannelDto;
 import io.omnika.common.rest.services.management.model.ChannelType;
 import io.omnika.services.telegram.channel.core.service.BotChannelProvider;
+import io.omnika.services.telegram.channel.service.saga.SendMessageToGatewaySaga;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -27,18 +28,23 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 @RequiredArgsConstructor
 public class BotChannelProviderImpl implements BotChannelProvider {
 
+    private static final String GET_ALL_CHANNELS_EXCHANGE = "getAllChannels";
+
     private final TelegramBotsApi telegramBotsApi;
-    private final StreamBridge streamBridge;
+    private final SendMessageToGatewaySaga sendMessageToGatewaySaga;
 
     /* key is a channel id, value is a bot interface */
     // pay attention: concurrent hash map without additional lockers can produce concurrency-problems
     // TODO: THINK ABOUT: maybe will be nice to write proxy for every data storage which will automatically protect it from problems of concurrency
+    // TODO: also maybe it will be nice to add all bots to context, make it spring beans
     private final Map<UUID, BotChannelService> bots = new ConcurrentHashMap<>();
 
+    @SendToStream(exchange = GET_ALL_CHANNELS_EXCHANGE)
     @EventListener(ApplicationReadyEvent.class)
-    public void onStartupRequestAllChannels() {
+    public ChannelType onStartupRequestAllChannels() {
         log.info("Sending trigger to get active telegram channels");
-        streamBridge.send("getAllChannels-in-0", ChannelType.TELEGRAM_BOT);
+//        streamBridge.send("getAllChannels-in-0", ChannelType.TELEGRAM_BOT);
+        return ChannelType.TELEGRAM_BOT;
     }
 
     // Currently we receiving all channels needs to be listened
@@ -77,7 +83,7 @@ public class BotChannelProviderImpl implements BotChannelProvider {
                 channelDto.getTenantId()
         );
 
-        BotChannelService botChannelService = new BotChannelService(channelDto, streamBridge);
+        BotChannelService botChannelService = new BotChannelService(channelDto, sendMessageToGatewaySaga);
         telegramBotsApi.registerBot(botChannelService);
         bots.put(channelDto.getId(), botChannelService);
     }

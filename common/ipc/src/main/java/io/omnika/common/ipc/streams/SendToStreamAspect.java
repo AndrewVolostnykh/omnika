@@ -1,4 +1,4 @@
-package io.omnika.services.messaging.gateway.core.aspect;
+package io.omnika.common.ipc.streams;
 
 import java.lang.reflect.Method;
 import lombok.RequiredArgsConstructor;
@@ -15,21 +15,24 @@ import org.springframework.stereotype.Component;
 public class SendToStreamAspect {
 
     private final StreamBridge streamBridge;
+    private static final String EXCHANGE_FORMULA = "%s-in-0";
 
-    @Around("@annotation(SendToStream)")
+    @Around("@annotation(io.omnika.common.ipc.streams.SendToStream)")
     public Object sendToStreamAdvice(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Object toSend = proceedingJoinPoint.proceed();
 
-        SendToStream sendToStreamAnnotation = getSendToStreamAnnotation(proceedingJoinPoint);
-
-        streamBridge.send(sendToStreamAnnotation.exchange(), toSend);
-
-        return toSend;
-    }
-
-    public SendToStream getSendToStreamAnnotation(ProceedingJoinPoint proceedingJoinPoint) {
         MethodSignature methodSignature = (MethodSignature) proceedingJoinPoint.getSignature();
         Method method = methodSignature.getMethod();
-        return method.getAnnotation(SendToStream.class);
+        SendToStream sendToStreamAnnotation = method.getAnnotation(SendToStream.class);
+
+        String exchange = sendToStreamAnnotation.exchange();
+
+        if (exchange.isBlank()) {
+            exchange = method.getName();
+        }
+
+        streamBridge.send(String.format(EXCHANGE_FORMULA, exchange), toSend);
+
+        return toSend;
     }
 }

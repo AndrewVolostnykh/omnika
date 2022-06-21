@@ -14,3 +14,4 @@ public class MessagingGatewayApplication {
         SpringApplication.run(MessagingGatewayApplication.class, args);
     }
 }
+

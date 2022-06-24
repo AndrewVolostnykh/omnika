@@ -1,10 +1,12 @@
 package io.omnika.services.messaging.gateway.web.controller;
 
+import io.omnika.common.rest.controller.BaseController;
 import io.omnika.common.rest.services.channels.dto.ChannelMessageDto;
 import io.omnika.services.messaging.gateway.service.MessageConsumerServiceImpl;
 import io.omnika.services.messaging.gateway.service.MessageProducerServiceImpl;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/messages")
 @RequiredArgsConstructor
-public class MessageConsumerController {
+public class MessageConsumerController extends BaseController {
 
     private final MessageConsumerServiceImpl messageConsumerService;
     private final MessageProducerServiceImpl messageProducerService;
@@ -32,6 +34,7 @@ public class MessageConsumerController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'MANAGER')")
     public ChannelMessageDto sendMessage(@RequestBody ChannelMessageDto channelMessageDto) {
         return messageProducerService.send(channelMessageDto);
     }

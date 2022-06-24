@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,15 @@ public class MessageConsumerServiceImpl {
     @Bean
     public Consumer<ChannelMessageDto> message() {
         return message -> {
+            // We have to ignore every of messages already present in database.
+            // An artifacts when to gateway incoming present messages can produce instagram channel service
+            // TODO: Cache
+            log.warn("[RECEIVED] Received but not processed [{}], channel id", message.getText(), message.getChannelSessionDto().getChannelId());
+
+            if (StringUtils.isNotBlank(message.getInternalId()) && channelMessageRepository.existsByInternalId(message.getInternalId())) {
+                return;
+            }
+
             log.warn("[NEW MESSAGE] Received new message with text [{}] channel id [{}] session id [{}]",
                     message.getText(),
                     message.getChannelSessionDto().getChannelId(),

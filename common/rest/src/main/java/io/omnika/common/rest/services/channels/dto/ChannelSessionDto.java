@@ -8,9 +8,10 @@ import lombok.Data;
 public class ChannelSessionDto {
 
     private UUID id;
-    private Long sessionId;
+    private String sessionId;
     private UUID channelId;
     private UUID tenantId;
     private ChannelType channelType;
 
+    // TODO: there should be stored information about sender
 }

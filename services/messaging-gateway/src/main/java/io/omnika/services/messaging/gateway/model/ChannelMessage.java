@@ -5,6 +5,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +15,10 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "channel_messages")
+@EqualsAndHashCode(callSuper = true)
 public class ChannelMessage extends BaseEntity {
+
+    private String internalId;
 
     private String text;
 

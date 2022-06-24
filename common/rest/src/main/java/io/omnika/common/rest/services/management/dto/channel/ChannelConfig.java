@@ -9,7 +9,8 @@ import io.omnika.common.rest.services.management.model.ChannelType;
         property = "type", visible = true)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = TelegramBotChannelConfig.class, name = "TELEGRAM_BOT"),
-        @JsonSubTypes.Type(value = ViberBotChannelConfig.class, name = "VIBER_BOT")
+        @JsonSubTypes.Type(value = ViberBotChannelConfig.class, name = "VIBER_BOT"),
+        @JsonSubTypes.Type(value = InstagramChannelConfig.class, name = "INSTAGRAM")
 })
 public interface ChannelConfig {
 

@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "channel_sessions")
 public class ChannelSession extends BaseEntity {
 
-    private Long sessionId; // should it have name like entity + id? Also interesting how it will work with viber/instagram
+    private String sessionId;
 
     private UUID channelId;
 

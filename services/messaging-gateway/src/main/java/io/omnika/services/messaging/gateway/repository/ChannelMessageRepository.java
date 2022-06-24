@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ChannelMessageRepository extends JpaRepository<ChannelMessage, UUID> {
 
+    boolean existsByInternalId(String internalId);
 }

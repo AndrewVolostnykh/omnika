@@ -8,7 +8,6 @@ import io.omnika.services.management.converters.ChannelConverter;
 import io.omnika.services.management.core.service.ChannelService;
 import io.omnika.services.management.model.channel.Channel;
 import io.omnika.services.management.repository.channel.ChannelRepository;
-import io.omnika.services.management.service.saga.SendAllChannelsSaga;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -23,14 +22,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 class ChannelServiceImpl implements ChannelService {
     private static final String NEW_TELEGRAM_CHANNEL_EXCHANGE = "newTelegramChannel";
+    private static final String ALL_CHANNELS_EXCHANGE = "allChannels";
+    private static final String ALL_TELEGRAM_CHANNELS_EXCHANGE = "allTelegramChannels";
+    private static final String ALL_VIBER_CHANNELS_EXCHANGE = "allViberChannels";
+    private static final String ALL_INSTAGRAM_CHANNELS_EXCHANGE = "allInstagramChannels";
 
     private final ChannelRepository channelRepository;
     private final ChannelConverter channelConverter;
     private final HibernateUtils hibernateUtils;
-    private final SendAllChannelsSaga sendAllChannelsSaga;
 
     @Override
-    @SendToStream(exchange = NEW_TELEGRAM_CHANNEL_EXCHANGE)
+    // how to send event about creating new chat if it can be instagram, telegram, viber?
+//    @SendToStream(exchange = NEW_TELEGRAM_CHANNEL_EXCHANGE)
     public ChannelDto create(UUID tenantId, ChannelDto channelDto) {
         channelDto.setTenantId(tenantId);
 
@@ -42,17 +45,51 @@ class ChannelServiceImpl implements ChannelService {
     }
 
     @Bean
-    public Consumer<ChannelType> getAllChannels() {
+    public Consumer<ChannelType> getAllChannels(ChannelServiceImpl channelService) {
         return channelType -> {
             log.warn("Received getAllChannels event with channel type [{}]", channelType);
-            sendAllChannelsSaga.send(listChannelsToServices(channelType));
+            List<ChannelDto> channelDtos;
+
+            switch (channelType) {
+                case TELEGRAM_BOT: {
+                    channelDtos = channelService.listTelegramChannelsToServices();
+                    break;
+                }
+                case VIBER_BOT: {
+                    channelDtos = channelService.listViberChannelsToServices();
+                    break;
+                }
+                case INSTAGRAM: {
+                    channelDtos = channelService.listInstagramChannelsToServices();
+                    break;
+                }
+                default: throw new IllegalStateException(channelType.name());
+            }
+
+            log.debug("Sent [{}] channels to services\n [{}]", channelType, channelDtos);
         };
     }
 
     // FIXME: change to database view, because it takes too long time to convert every entity to needed type
     // FIXME: add pagination. According to large sets of channels in future, we need to use pagination (yes, also for queue-messaging)
-    private List<ChannelDto> listChannelsToServices(ChannelType channelType) {
-        return hibernateUtils.doInNewTransaction(() -> listAllByType(channelType));
+//    @SendToStream(exchange = ALL_CHANNELS_EXCHANGE)
+//    public List<ChannelDto> listChannelsToServices(ChannelType channelType) {
+//        return hibernateUtils.doInNewTransaction(() -> listAllByType(channelType));
+//    }
+
+    @SendToStream(exchange = ALL_TELEGRAM_CHANNELS_EXCHANGE)
+    public List<ChannelDto> listTelegramChannelsToServices() {
+        return hibernateUtils.doInNewTransaction(() -> listAllByType(ChannelType.TELEGRAM_BOT));
+    }
+
+    @SendToStream(exchange = ALL_VIBER_CHANNELS_EXCHANGE)
+    public List<ChannelDto> listViberChannelsToServices() {
+        return hibernateUtils.doInNewTransaction(() -> listAllByType(ChannelType.VIBER_BOT));
+    }
+
+    @SendToStream(exchange = ALL_INSTAGRAM_CHANNELS_EXCHANGE)
+    public List<ChannelDto> listInstagramChannelsToServices() {
+        return hibernateUtils.doInNewTransaction(() -> listAllByType(ChannelType.INSTAGRAM));
     }
 
 //    @Transactional(readOnly = true)

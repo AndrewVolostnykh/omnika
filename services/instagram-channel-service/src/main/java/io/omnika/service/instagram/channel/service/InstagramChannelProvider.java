@@ -1,17 +1,15 @@
-package io.omnika.services.telegram.channel.service;
+package io.omnika.service.instagram.channel.service;
 
 import io.omnika.common.ipc.streams.SendToStream;
 import io.omnika.common.rest.services.channels.dto.ChannelMessageDto;
 import io.omnika.common.rest.services.management.dto.channel.ChannelDto;
 import io.omnika.common.rest.services.management.model.ChannelType;
-import io.omnika.services.telegram.channel.core.service.BotChannelProvider;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -20,30 +18,23 @@ import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BotChannelProviderImpl implements BotChannelProvider {
+public class InstagramChannelProvider {
+    private static final String GET_ALL_INSTAGRAM_CHANNELS = "getAllChannels";
 
-    private static final String GET_ALL_CHANNELS_EXCHANGE = "getAllChannels";
-
-    private final TelegramBotsApi telegramBotsApi;
     private final StreamBridge streamBridge;
+    private final ExecutorService workStealingPool;
 
-    /* key is a channel id, value is a bot interface */
-    // pay attention: concurrent hash map without additional lockers can produce concurrency-problems
-    // TODO: THINK ABOUT: maybe will be nice to write proxy for every data storage which will automatically protect it from problems of concurrency
-    // TODO: also maybe it will be nice to add all bots to context, make it spring beans
-    private final Map<UUID, BotChannelService> bots = new ConcurrentHashMap<>();
+    private final Map<UUID, InstagramChannel> instagramChannels = new ConcurrentHashMap<>();
 
-    @SendToStream(exchange = GET_ALL_CHANNELS_EXCHANGE)
+    @SendToStream(exchange = GET_ALL_INSTAGRAM_CHANNELS)
     @EventListener(ApplicationReadyEvent.class)
     public ChannelType onStartupRequestAllChannels() {
-        log.info("Sending trigger to get active telegram channels");
-        return ChannelType.TELEGRAM_BOT;
+        log.warn("Sending trigger to get active instagram channels");
+        return ChannelType.INSTAGRAM;
     }
 
     // Currently we receiving all channels needs to be listened
@@ -51,26 +42,26 @@ public class BotChannelProviderImpl implements BotChannelProvider {
     // close to thousands or more, it will be a problem
     // TODO: develop queued-data-pagination abstractions and processors
     @Bean
-    public Consumer<List<ChannelDto>> allTelegramChannels() {
+    public Consumer<List<ChannelDto>> allInstagramChannels() {
         return channels -> channels.forEach(channel -> {
             // FIXME: remove id
             // TODO: cover it with async processing, but not just for each
             log.warn("[ALL CHANNELS EVENT] Channel received. Name [{}], channel id [{}], tenant name [{}]", channel.getName(), channel.getId(), channel.getTenantId());
-            createBot(channel);
+            createChannel(channel);
         });
     }
 
     @Bean
-    public Consumer<ChannelDto> newTelegramChannel() {
+    public Consumer<ChannelDto> newInstagramChannel() {
         return channel -> {
             log.warn("[NEW CHANNEL EVENT] New channel received. Bot [{}], channel id [{}], tenant name [{}]", channel.getName(), channel.getId(), channel.getTenantId());
-            createBot(channel);
+            createChannel(channel);
         };
     }
 
     @Bean
-    public Consumer<ChannelMessageDto> toTelegramChannelMessage() {
-        return message -> bots.get(message.getChannelSessionDto().getChannelId()).sendMessage(message);
+    public Consumer<ChannelMessageDto> toInstagramChannelMessage() {
+        return message -> instagramChannels.get(message.getChannelSessionDto().getChannelId()).sendMessage(message);
     }
 
     // TODO: think about it. Telegram bot library on bot creating starts
@@ -79,7 +70,7 @@ public class BotChannelProviderImpl implements BotChannelProvider {
     // using DiscoveryClient track heap state to start new instance of
     // telegram channel service
     @SneakyThrows
-    public void createBot(ChannelDto channelDto) {
+    public void createChannel(ChannelDto channelDto) {
         log.warn(
                 "Registering bot channel [{}], id [{}], tenant id [{}]",
                 channelDto.getName(),
@@ -87,26 +78,8 @@ public class BotChannelProviderImpl implements BotChannelProvider {
                 channelDto.getTenantId()
         );
 
-        BotChannelService botChannelService = new BotChannelService(channelDto, streamBridge);
-        telegramBotsApi.registerBot(botChannelService);
-        bots.put(channelDto.getId(), botChannelService);
+        InstagramChannel instagramChannel = new InstagramChannel(channelDto, streamBridge, true, workStealingPool);
+        instagramChannels.put(channelDto.getId(), instagramChannel);
+        instagramChannel.start();
     }
-
-//    @Bean
-//    @SneakyThrows
-    public void stopChannel(UUID channelId) {
-        Optional.ofNullable(bots.remove(channelId)).ifPresent(toStopChannel -> {
-//            log.info("Bot [{}], channel id [{}] stopped", toStopChannel.getBotUsername(), toStopChannel.getMetadata().getId());
-            try {
-                toStopChannel.clearWebhook();
-            } catch (TelegramApiRequestException e) {
-                log.error("Exception on stopping channel", e);
-            }
-        });
-    }
-
-    public List<ChannelDto> list() {
-        return bots.values().stream().map(BotChannelService::getMetadata).collect(Collectors.toList());
-    }
-
 }

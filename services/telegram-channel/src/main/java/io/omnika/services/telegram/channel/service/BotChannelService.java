@@ -4,8 +4,8 @@ import io.omnika.common.rest.services.channels.dto.ChannelMessageDto;
 import io.omnika.common.rest.services.channels.dto.ChannelSessionDto;
 import io.omnika.common.rest.services.management.dto.channel.ChannelDto;
 import io.omnika.common.rest.services.management.dto.channel.TelegramBotChannelConfig;
-import io.omnika.services.telegram.channel.service.saga.SendMessageToGatewaySaga;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -18,14 +18,14 @@ public class BotChannelService extends TelegramLongPollingBot {
     private final ChannelDto metadata;
     private final String botName;
     private final String apiKey;
-    private final SendMessageToGatewaySaga sendMessageToGatewaySaga;
+    private final StreamBridge streamBridge;
 
-    public BotChannelService(ChannelDto metadata, SendMessageToGatewaySaga sendMessageToGatewaySaga) {
+    public BotChannelService(ChannelDto metadata, StreamBridge streamBridge) {
         super();
         this.metadata = metadata;
         this.botName = ((TelegramBotChannelConfig) metadata.getConfig()).getBotName();
         this.apiKey = ((TelegramBotChannelConfig) metadata.getConfig()).getApiKey();
-        this.sendMessageToGatewaySaga = sendMessageToGatewaySaga;
+        this.streamBridge = streamBridge;
     }
 
     @Override
@@ -35,22 +35,23 @@ public class BotChannelService extends TelegramLongPollingBot {
         ChannelSessionDto channelSessionDto = new ChannelSessionDto();
         channelSessionDto.setTenantId(getMetadata().getTenantId());
         channelSessionDto.setChannelId(getMetadata().getId());
-        channelSessionDto.setSessionId(message.getChatId());
+        channelSessionDto.setSessionId(message.getChatId().toString());
         channelSessionDto.setChannelType(getMetadata().getChannelType());
 
         ChannelMessageDto channelMessageDto = new ChannelMessageDto();
         channelMessageDto.setText(message.getText());
         channelMessageDto.setChannelSessionDto(channelSessionDto);
 
-        ChannelMessageDto sentMessage = sendMessageToGatewaySaga.send(channelMessageDto);
+        // FIXME: it should not be StreamBridge
+        streamBridge.send("message-in-0", channelMessageDto);
 
         // TODO: change to TRACE
         log.warn(
-                "Sent message: text [{}], tenant id [{}], channel id [{}], session id [{}]",
-                sentMessage.getText(),
-                sentMessage.getChannelSessionDto().getTenantId(),
-                sentMessage.getChannelSessionDto().getChannelId(),
-                sentMessage.getChannelSessionDto().getSessionId()
+                "Received message: text [{}], tenant id [{}], channel id [{}], session id [{}]",
+                channelMessageDto.getText(),
+                channelMessageDto.getChannelSessionDto().getTenantId(),
+                channelMessageDto.getChannelSessionDto().getChannelId(),
+                channelMessageDto.getChannelSessionDto().getSessionId()
         );
     }
 

@@ -1,5 +1,6 @@
 package io.omnika.common.security.config;
 
+import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @ComponentScan("io.omnika.common.security")
@@ -23,7 +25,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
+                .cors().configurationSource(request -> {
+                    CorsConfiguration corsConfiguration = new CorsConfiguration();
+                    corsConfiguration.setAllowedOrigins(List.of("*"));
+                    corsConfiguration.setAllowedOriginPatterns(List.of("/**"));
+                    corsConfiguration.setAllowedMethods(List.of("POST", "GET", "PUT", "DELETE"));
+                    corsConfiguration.setAllowedHeaders(List.of("Content-Type", "Authorization"));
+                    return corsConfiguration;
+                })
+
+                .and().authorizeRequests()
                 .anyRequest().permitAll()
 
                 .and()
@@ -32,6 +43,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .csrf().disable();
+
     }
 
     @Bean

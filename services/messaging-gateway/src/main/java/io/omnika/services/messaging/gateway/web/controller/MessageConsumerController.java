@@ -29,6 +29,7 @@ public class MessageConsumerController extends BaseController {
     // TODO: websocket connection for consuming messages
 
     @GetMapping("/list")
+    // TODO: remove
     public List<ChannelMessageDto> listAllMessages() {
         return messageConsumerService.allMessages();
     }

@@ -1,5 +1,6 @@
 package io.omnika.services.messaging.gateway.model;
 
+import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -19,6 +20,8 @@ import lombok.Setter;
 public class ChannelMessage extends BaseEntity {
 
     private String internalId;
+
+    private LocalDateTime receivedAt;
 
     private String text;
 

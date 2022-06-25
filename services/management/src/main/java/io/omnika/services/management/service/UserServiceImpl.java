@@ -23,7 +23,9 @@ import io.omnika.services.management.core.service.UserService;
 import io.omnika.services.management.model.Tenant;
 import io.omnika.services.management.model.User;
 import io.omnika.services.management.repository.UserRepository;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -145,5 +147,12 @@ class UserServiceImpl implements UserService {
         return userRepository.findById(userPrincipal.getUserId())
                 .map(userConverter::toDto)
                 .orElseThrow(() -> new ObjectNotFoundException(userPrincipal.getUserId(), User.class));
+    }
+
+    @Override
+    public List<UserDto> list(UUID tenantId) {
+        return userRepository.findAllByTenantId(tenantId).stream()
+                .map(userConverter::toDto)
+                .collect(Collectors.toList());
     }
 }

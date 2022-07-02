@@ -21,6 +21,9 @@ public class ExceptionCodes {
     public static class Auth {
         public static final String LOGIN_OR_PASSWORD_INCORRECT = "LOGIN_OR_PASSWORD_INCORRECT";
         public static final String USER_NOT_ACTIVE = "USER_NOT_ACTIVE";
+        public static final String TOKEN_EXPIRED = "TOKEN_EXPIRED";
+        public static final String USER_NOT_AUTHORIZED = "USER_NOT_AUTHORIZED";
+
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

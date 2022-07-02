@@ -16,14 +16,19 @@ public class UserControllerImpl extends BaseController implements UserController
     private final UserService userService;
 
     @Override
-    @PreAuthorize("hasAnyAuthority('TENANT', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'MANAGER')")
     public UserDto getCurrent() {
         return userService.getCurrent();
     }
 
     @Override
-    @PreAuthorize("hasAnyAuthority('TENANT')")
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN')")
     public List<UserDto> getTenantsUsers() {
         return userService.list(getPrincipal().getTenantId());
+    }
+
+    @Override
+    public List<UserDto> getTenantManagers() {
+        return userService.listManagers(getPrincipal().getTenantId());
     }
 }

@@ -1,5 +1,6 @@
 package io.omnika.common.security.utils;
 
+import io.omnika.common.exceptions.ExceptionCodes.Auth;
 import io.omnika.common.exceptions.auth.AuthenticationException;
 import io.omnika.common.security.model.UserPrincipal;
 import java.util.Optional;
@@ -16,7 +17,7 @@ public class AuthenticationHelper {
                 .map(Authentication::getPrincipal)
                 .filter(UserPrincipal.class::isInstance)
                 .map(UserPrincipal.class::cast)
-                .orElseThrow(AuthenticationException::new);
+                .orElseThrow(() -> new AuthenticationException(Auth.USER_NOT_AUTHORIZED));
     }
 
 }

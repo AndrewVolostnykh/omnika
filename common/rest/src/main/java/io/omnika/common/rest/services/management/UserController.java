@@ -19,4 +19,7 @@ public interface UserController {
     @GetMapping("/tenant/users")
     List<UserDto> getTenantsUsers();
 
+    @GetMapping("/tenant/managers")
+    List<UserDto> getTenantManagers();
+
 }

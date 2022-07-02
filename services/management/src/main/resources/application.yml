@@ -36,5 +36,6 @@ spring:
 security:
   token:
     signing_key: ${SECURITY_TOKEN_SIGNING_KEY:abababa}
-    lifetime: ${SECURITY_TOKEN_LIFETIME:86400}  # 24 hours by default
+    lifetime: ${SECURITY_TOKEN_LIFETIME:7200}  # 2 hours by default
+    refresh_lifetime: ${SECURITY_REFRESH_TOKEN_LIFETIME:604800} # 7 days by default
     request_header: ${SECURITY_TOKEN_REQUEST_HEADER:X-Authorization}

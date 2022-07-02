@@ -23,6 +23,10 @@ public class ChannelSession extends BaseEntity {
 
     private LocalDateTime receivedAt;
 
+    // id of user for assignment. Every of tenant can see every of sessions
+    // if assigned id = tenant id - managers will not see this session
+    private UUID assignedToUser;
+
     private UUID channelId;
 
     private UUID tenantId;

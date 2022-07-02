@@ -3,7 +3,7 @@ package io.omnika.services.management.converters;
 import io.omnika.common.core.converters.AbstractBasicEntityConverter;
 import io.omnika.common.rest.services.management.dto.channel.ChannelDto;
 import io.omnika.services.management.converters.mappers.ChannelMapper;
-import io.omnika.services.management.model.channel.Channel;
+import io.omnika.services.management.model.Channel;
 import org.springframework.stereotype.Component;
 
 @Component

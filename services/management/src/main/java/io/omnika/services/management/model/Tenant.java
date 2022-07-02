@@ -1,7 +1,6 @@
 package io.omnika.services.management.model;
 
 import io.omnika.services.management.core.model.BaseEntity;
-import io.omnika.services.management.model.channel.Channel;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.Entity;

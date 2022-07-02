@@ -24,4 +24,8 @@ public interface UserService {
     UserDto getCurrent();
 
     List<UserDto> list(UUID tenantId);
+
+    UserDto get(UUID id);
+
+    List<UserDto> listManagers(UUID tenantId);
 }

@@ -3,6 +3,7 @@ package io.omnika.common.rest.services.management.dto.channel;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.omnika.common.rest.services.management.model.ChannelType;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -31,5 +32,7 @@ public class ChannelDto {
     private LocalDateTime updateTime;
 
     private JsonNode metadata;
+
+    private Set<UUID> assignedUsers;
 
 }

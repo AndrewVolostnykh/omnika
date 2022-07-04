@@ -1,6 +1,8 @@
 package io.omnika.services.management.repository;
 
+import io.omnika.common.security.model.Authority;
 import io.omnika.services.management.model.User;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +15,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmail(String email);
 
     Optional<User> findByActivationToken(UUID activationToken);
+
+    List<User> findAllByTenantId(UUID tenantId);
+
+    List<User> findAllByAuthorityAndTenantId(Authority authority, UUID tenantId);
 
 }

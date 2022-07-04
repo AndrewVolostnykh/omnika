@@ -14,8 +14,13 @@ public class TenantControllerImpl extends BaseController implements TenantContro
 
     private final TenantService tenantService;
 
+    @Override
     public TenantDto get(UUID tenantId) {
         return tenantService.get(tenantId);
     }
 
+    @Override
+    public TenantDto get() {
+        return tenantService.get(getPrincipal().getTenantId());
+    }
 }

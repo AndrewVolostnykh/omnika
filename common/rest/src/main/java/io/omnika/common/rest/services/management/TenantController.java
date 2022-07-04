@@ -16,4 +16,7 @@ public interface TenantController {
     @GetMapping("/{tenantId}")
     TenantDto get(@PathVariable("tenantId") UUID tenantId);
 
+    @GetMapping
+    TenantDto get();
+
 }

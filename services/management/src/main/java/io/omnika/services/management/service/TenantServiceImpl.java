@@ -32,4 +32,6 @@ class TenantServiceImpl implements TenantService {
                 tenantRepository.findById(tenantId).orElseThrow(() -> new ObjectNotFoundException(tenantId, Tenant.class))
         );
     }
+
+
 }

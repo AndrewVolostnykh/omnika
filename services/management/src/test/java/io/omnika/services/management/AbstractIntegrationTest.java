@@ -113,7 +113,7 @@ public abstract class AbstractIntegrationTest {
 
     @SneakyThrows
     protected UserDto getCurrentUser(TokenDto token) {
-        MvcResult mvcResult = mockMvc.perform(get("/user/current").header("X-Authorization", token.getAuthToken())
+        MvcResult mvcResult = mockMvc.perform(get("/user/current").header("X-Authorization", token.getAccessToken())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -123,7 +123,7 @@ public abstract class AbstractIntegrationTest {
 
     @SneakyThrows
     protected TenantDto createTenant(TenantDto tenantDto, TokenDto token) {
-        MvcResult mvcResult = mockMvc.perform(post("/tenant").header("X-Authorization", token.getAuthToken())
+        MvcResult mvcResult = mockMvc.perform(post("/tenant").header("X-Authorization", token.getAccessToken())
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(tenantDto)))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -133,7 +133,7 @@ public abstract class AbstractIntegrationTest {
 
     @SneakyThrows
     protected List<TenantDto> listTenants(TokenDto tokenDto) {
-        MvcResult mvcResult = mockMvc.perform(get("/tenant").header("X-Authorization", tokenDto.getAuthToken())
+        MvcResult mvcResult = mockMvc.perform(get("/tenant").header("X-Authorization", tokenDto.getAccessToken())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -144,7 +144,7 @@ public abstract class AbstractIntegrationTest {
 
     @SneakyThrows
     protected ManagerDto createManager(CreateManagerDto createManagerDto, TokenDto tokenDto) {
-        MvcResult mvcResult = mockMvc.perform(post("/manager").header("X-Authorization", tokenDto.getAuthToken())
+        MvcResult mvcResult = mockMvc.perform(post("/manager").header("X-Authorization", tokenDto.getAccessToken())
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(createManagerDto)))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -155,7 +155,7 @@ public abstract class AbstractIntegrationTest {
     @SneakyThrows
     protected TelegramBotChannelConfig createTelegramBotChannel(TelegramBotChannelConfig telegramBotChannelDto, TokenDto tokenDto) {
         MvcResult mvcResult = mockMvc.perform(post("/channel/telegram")
-                .header("X-Authorization", tokenDto.getAuthToken())
+                .header("X-Authorization", tokenDto.getAccessToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(telegramBotChannelDto)))
                 .andExpect(status().isOk())

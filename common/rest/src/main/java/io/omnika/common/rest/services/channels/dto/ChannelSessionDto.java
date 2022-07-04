@@ -1,6 +1,7 @@
 package io.omnika.common.rest.services.channels.dto;
 
 import io.omnika.common.rest.services.management.model.ChannelType;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Data;
 
@@ -8,10 +9,10 @@ import lombok.Data;
 public class ChannelSessionDto {
 
     private UUID id;
+    private LocalDateTime receivedAt;
     private String sessionId;
     private UUID channelId;
     private UUID tenantId;
     private ChannelType channelType;
-
-    // TODO: there should be stored information about sender
+    private SenderDto sender;
 }

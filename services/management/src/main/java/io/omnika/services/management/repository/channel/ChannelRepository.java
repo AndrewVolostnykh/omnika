@@ -1,7 +1,8 @@
 package io.omnika.services.management.repository.channel;
 
 import io.omnika.common.rest.services.management.model.ChannelType;
-import io.omnika.services.management.model.channel.Channel;
+import io.omnika.services.management.model.Channel;
+import io.omnika.services.management.model.User;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,5 +16,7 @@ public interface ChannelRepository extends JpaRepository<Channel, Long> {
     List<Channel> findAllByChannelType(ChannelType type);
 
     List<Channel> findAllByTenantId(UUID tenantId);
+
+    List<Channel> findAllByAssignedUsersContainsAndTenantId(User user, UUID tenantId);
 
 }

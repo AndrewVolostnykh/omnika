@@ -6,6 +6,7 @@ import io.omnika.common.rest.services.management.dto.auth.SignUpDto;
 import io.omnika.common.rest.services.management.dto.auth.SigningDto;
 import io.omnika.common.rest.services.management.dto.auth.TokenDto;
 import io.omnika.common.rest.services.management.dto.manager.CreateManagerDto;
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
@@ -16,13 +17,15 @@ public interface UserService {
 
     TokenDto login(SigningDto signingDto);
 
-//    UserDto get(Long id);
-//
-//    UserDto createNeedActivation(String email);
-
     TokenDto activate(UUID activationToken);
 
     TokenDto setPassword(UUID activationToken, SetPasswordDto setPasswordDto);
 
     UserDto getCurrent();
+
+    List<UserDto> list(UUID tenantId);
+
+    UserDto get(UUID id);
+
+    List<UserDto> listManagers(UUID tenantId);
 }

@@ -7,6 +7,7 @@ import io.omnika.services.messaging.gateway.model.ChannelMessage;
 import io.omnika.services.messaging.gateway.model.ChannelSession;
 import io.omnika.services.messaging.gateway.repository.ChannelMessageRepository;
 import io.omnika.services.messaging.gateway.repository.ChannelSessionRepository;
+import io.omnika.services.messaging.gateway.repository.SenderRepository;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -25,6 +26,7 @@ public class MessageConsumerServiceImpl {
     private final ChannelSessionRepository channelSessionRepository;
     private final ChannelMessageRepository channelMessageRepository;
     private final ChannelMessageConverter channelMessageConverter;
+    private final SenderRepository senderRepository;
 
     // WARNING! If we will throw message in time of messaging gateway starting up
     // it will not process this message, only new received after start up
@@ -34,8 +36,6 @@ public class MessageConsumerServiceImpl {
             // We have to ignore every of messages already present in database.
             // An artifacts when to gateway incoming present messages can produce instagram channel service
             // TODO: Cache
-            log.warn("[RECEIVED] Received but not processed [{}], channel id", message.getText(), message.getChannelSessionDto().getChannelId());
-
             if (StringUtils.isNotBlank(message.getInternalId()) && channelMessageRepository.existsByInternalId(message.getInternalId())) {
                 return;
             }
@@ -48,9 +48,7 @@ public class MessageConsumerServiceImpl {
             ChannelMessage channelMessage = channelMessageConverter.toDomain(message);
 
             ChannelSession channelSession;
-            // there should be used some cache, because on every message not so
-            // efficient to go to DB and check for a session presents
-            // FIXME: exists by id and channel id
+            // TODO: cache
             if (channelSessionRepository
                     .existsBySessionIdAndChannelId(message.getChannelSessionDto().getSessionId(), message.getChannelSessionDto().getChannelId())) {
                 channelSession = channelSessionRepository
@@ -59,6 +57,7 @@ public class MessageConsumerServiceImpl {
 
                 channelMessage.setChannelSession(channelSession);
             } else {
+                senderRepository.save(channelMessage.getChannelSession().getSender());
                 channelSessionRepository.save(channelMessage.getChannelSession());
             }
 

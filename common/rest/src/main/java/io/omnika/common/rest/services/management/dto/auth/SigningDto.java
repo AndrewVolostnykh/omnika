@@ -1,14 +1,18 @@
 package io.omnika.common.rest.services.management.dto.auth;
 
 import io.omnika.common.exceptions.ExceptionCodes.Validation;
+import io.omnika.common.rest.services.management.constraints.ValidPassword;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class SigningDto {
 
     @NotNull(message = Validation.EMAIL_REQUIRED)
@@ -16,7 +20,7 @@ public class SigningDto {
     private String email;
 
     @NotNull(message = Validation.PASSWORD_REQUIRED)
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$", message = Validation.INVALID_PASSWORD_PATTERN)
+    @ValidPassword
     private String password;
 
 }

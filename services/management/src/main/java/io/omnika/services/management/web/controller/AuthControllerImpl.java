@@ -7,11 +7,15 @@ import io.omnika.common.rest.services.management.dto.auth.SignUpDto;
 import io.omnika.common.rest.services.management.dto.auth.SigningDto;
 import io.omnika.common.rest.services.management.dto.auth.TokenDto;
 import io.omnika.common.rest.services.management.dto.manager.CreateManagerDto;
+import io.omnika.common.security.core.service.TokenService;
 import io.omnika.services.management.core.service.UserService;
+import io.omnika.services.management.service.SecurityService;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -19,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthControllerImpl extends BaseController implements AuthController {
 
     private final UserService userService;
+    private final SecurityService securityService;
+    private final TokenService tokenService;
 
     @Override
     public void signUp(@Valid SignUpDto signingDto) {
@@ -29,6 +35,11 @@ public class AuthControllerImpl extends BaseController implements AuthController
     @PreAuthorize("hasRole('TENANT_ADMIN')")
     public void signUpManger(@Valid CreateManagerDto createManagerDto) {
         userService.signUpManager(getPrincipal().getTenantId(), createManagerDto);
+    }
+
+    @GetMapping("/test")
+    public String testConnection() {
+        return "connection succeed";
     }
 
     @Override
@@ -50,14 +61,15 @@ public class AuthControllerImpl extends BaseController implements AuthController
     public TokenDto login(SigningDto signingDto) {
         return userService.login(signingDto);
     }
+
+    @Override
+    public TokenDto refresh(HttpServletRequest request) {
+        UUID userId = tokenService.getUserId(tokenService.extractToken(request));
+        return securityService.refresh(userService.get(userId));
+    }
 //
 //    @Override
 //    public TokenDto signUp(UUID activationToken, SetPasswordDto setPasswordDto) {
 //        return userService.activate(activationToken, setPasswordDto);
 //    }
-
-    // creating user with organization (tenant)
-    // ?creating manager for organization (tenant)
-    // activating user
-    // login
 }

@@ -16,9 +16,9 @@
 
     <modules>
         <module>management</module>
-        <module>telegram-channel</module>
         <module>messaging-gateway</module>
-        <module>instagram-channel-service</module>
+        <module>telegram-channel</module>
+        <module>instagram-channel</module>
     </modules>
 
 </project>

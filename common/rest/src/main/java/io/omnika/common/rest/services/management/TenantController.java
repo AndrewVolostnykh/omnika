@@ -1,6 +1,6 @@
 package io.omnika.common.rest.services.management;
 
-import io.omnika.common.rest.services.management.dto.TenantDto;
+import io.omnika.common.rest.services.management.dto.Tenant;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface TenantController {
 
     @GetMapping("/{tenantId}")
-    TenantDto get(@PathVariable("tenantId") UUID tenantId);
+    Tenant get(@PathVariable("tenantId") UUID tenantId);
 
 }

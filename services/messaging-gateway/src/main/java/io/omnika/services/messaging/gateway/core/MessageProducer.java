@@ -1,11 +1,11 @@
 package io.omnika.services.messaging.gateway.core;
 
-import io.omnika.common.rest.services.channels.dto.ChannelMessageDto;
-import io.omnika.common.rest.services.management.model.ChannelType;
+import io.omnika.common.model.channel.ChannelMessage;
+import io.omnika.common.model.channel.ChannelType;
 
 public interface MessageProducer {
 
-    ChannelMessageDto send(ChannelMessageDto channelMessageDto);
+    ChannelMessage send(ChannelMessage channelMessage);
 
     boolean isApplicable(ChannelType channelType);
 }

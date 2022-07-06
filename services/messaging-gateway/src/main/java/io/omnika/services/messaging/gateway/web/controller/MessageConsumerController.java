@@ -1,7 +1,7 @@
 package io.omnika.services.messaging.gateway.web.controller;
 
 import io.omnika.common.rest.controller.BaseController;
-import io.omnika.common.rest.services.channels.dto.ChannelMessageDto;
+import io.omnika.common.model.channel.ChannelMessage;
 import io.omnika.services.messaging.gateway.service.MessageConsumerServiceImpl;
 import io.omnika.services.messaging.gateway.service.MessageProducerServiceImpl;
 import java.util.List;
@@ -29,13 +29,13 @@ public class MessageConsumerController extends BaseController {
     // TODO: websocket connection for consuming messages
 
     @GetMapping("/list")
-    public List<ChannelMessageDto> listAllMessages() {
+    public List<ChannelMessage> listAllMessages() {
         return messageConsumerService.allMessages();
     }
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'MANAGER')")
-    public ChannelMessageDto sendMessage(@RequestBody ChannelMessageDto channelMessageDto) {
-        return messageProducerService.send(channelMessageDto);
+    public ChannelMessage sendMessage(@RequestBody ChannelMessage channelMessage) {
+        return messageProducerService.send(channelMessage);
     }
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>common</artifactId>
+        <groupId>io.omnika.common</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>channel-api</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.omnika.common.ipc</groupId>
+            <artifactId>ipc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.omnika.common.rest</groupId>
+            <artifactId>rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.omnika.common</groupId>
+            <artifactId>model</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

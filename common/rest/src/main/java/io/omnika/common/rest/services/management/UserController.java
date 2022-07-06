@@ -1,6 +1,6 @@
 package io.omnika.common.rest.services.management;
 
-import io.omnika.common.rest.services.management.dto.UserDto;
+import io.omnika.common.rest.services.management.dto.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +14,6 @@ public interface UserController {
 
     @Operation(description = "Get current user by token")
     @GetMapping("/current")
-    UserDto getCurrent();
+    User getCurrent();
 
 }

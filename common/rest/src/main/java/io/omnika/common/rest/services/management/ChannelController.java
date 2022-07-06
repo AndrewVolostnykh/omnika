@@ -1,6 +1,6 @@
 package io.omnika.common.rest.services.management;
 
-import io.omnika.common.rest.services.management.dto.channel.ChannelDto;
+import io.omnika.common.model.channel.Channel;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 public interface ChannelController {
 
     @PostMapping
-    ChannelDto create(@RequestBody ChannelDto channelDto);
+    Channel create(@RequestBody Channel channel);
 
     @GetMapping("/list")
-    List<ChannelDto> list();
+    List<Channel> listChannels();
 
 }

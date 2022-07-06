@@ -1,12 +1,13 @@
 package io.omnika.services.management.core.service;
 
-import io.omnika.common.rest.services.management.dto.TenantDto;
+import io.omnika.common.rest.services.management.dto.Tenant;
+
 import java.util.UUID;
 
 public interface TenantService {
 
-    TenantDto create(TenantDto tenantDto);
+    Tenant create(Tenant tenant);
 
-    TenantDto get(UUID tenantId);
+    Tenant get(UUID tenantId);
 
 }

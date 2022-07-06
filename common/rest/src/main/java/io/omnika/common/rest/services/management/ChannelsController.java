@@ -1,6 +1,6 @@
 package io.omnika.common.rest.services.management;
 
-import io.omnika.common.rest.services.management.dto.channel.ChannelDto;
+import io.omnika.common.model.channel.Channel;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,5 +16,5 @@ public interface ChannelsController {
     // because there is a problem with pagination
     // as first problem we will meet
     @GetMapping
-    List<ChannelDto> list();
+    List<Channel> list();
 }

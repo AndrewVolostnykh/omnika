@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>io.omnika.common</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>model</artifactId>
         </dependency>
 
         <dependency>

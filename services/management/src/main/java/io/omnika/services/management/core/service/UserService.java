@@ -1,6 +1,6 @@
 package io.omnika.services.management.core.service;
 
-import io.omnika.common.rest.services.management.dto.UserDto;
+import io.omnika.common.rest.services.management.dto.User;
 import io.omnika.common.rest.services.management.dto.auth.SetPasswordDto;
 import io.omnika.common.rest.services.management.dto.auth.SignUpDto;
 import io.omnika.common.rest.services.management.dto.auth.SigningDto;
@@ -24,5 +24,5 @@ public interface UserService {
 
     TokenDto setPassword(UUID activationToken, SetPasswordDto setPasswordDto);
 
-    UserDto getCurrent();
+    User getCurrent();
 }

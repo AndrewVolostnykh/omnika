@@ -1,7 +1,7 @@
 package io.omnika.services.management.web.controller;
 
 import io.omnika.common.rest.services.management.UserController;
-import io.omnika.common.rest.services.management.dto.UserDto;
+import io.omnika.common.rest.services.management.dto.User;
 import io.omnika.services.management.core.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,7 +13,7 @@ public class UserControllerImpl implements UserController {
     private final UserService userService;
 
     @Override
-    public UserDto getCurrent() {
+    public User getCurrent() {
         return userService.getCurrent();
     }
 }

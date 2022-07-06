@@ -13,6 +13,7 @@ import io.omnika.common.exceptions.auth.UserNotFoundException;
 import io.omnika.common.security.model.UserPrincipal;
 import io.omnika.common.security.utils.AuthenticationHelper;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,6 +65,10 @@ public class BaseController {
      * with {@link org.springframework.security.access.prepost.PreAuthorize} annotation */
     public UserPrincipal getPrincipal() {
         return AuthenticationHelper.getAuthenticationDetails();
+    }
+
+    public UUID getTenantId() {
+        return getPrincipal().getTenantId();
     }
 
 }

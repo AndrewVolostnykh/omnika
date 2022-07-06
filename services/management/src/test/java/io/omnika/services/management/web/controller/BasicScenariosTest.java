@@ -6,17 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.omnika.common.rest.services.management.dto.TenantDto;
-import io.omnika.common.rest.services.management.dto.UserDto;
+import io.omnika.common.rest.services.management.dto.Tenant;
+import io.omnika.common.rest.services.management.dto.User;
 import io.omnika.common.rest.services.management.dto.auth.SetPasswordDto;
 import io.omnika.common.rest.services.management.dto.auth.TokenDto;
-import io.omnika.common.rest.services.management.dto.channel.TelegramBotChannelConfig;
+import io.omnika.common.model.channel.TelegramBotChannelConfig;
 import io.omnika.common.rest.services.management.dto.manager.CreateManagerDto;
 import io.omnika.common.rest.services.management.dto.manager.ManagerDto;
 import io.omnika.services.management.AbstractIntegrationTest;
-import io.omnika.services.management.model.User;
+import io.omnika.services.management.model.UserEntity;
 import java.util.List;
 import java.util.UUID;
+
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
@@ -39,23 +40,23 @@ class BasicScenariosTest extends AbstractIntegrationTest {
 
         assertNotNull(token);
 
-        UserDto currentUser = getCurrentUser(token);
+        User currentUser = getCurrentUser(token);
 
         assertNotNull(token);
         assertEquals(testUserEmail, currentUser.getEmail());
 
-        TenantDto tenantDto = new TenantDto();
-        tenantDto.setName(testTenantName);
+        Tenant tenant = new Tenant();
+        tenant.setName(testTenantName);
 //        tenantDto.setUser(currentUser);
-        TenantDto createdTenant = createTenant(tenantDto, token);
+        Tenant createdTenant = createTenant(tenant, token);
 
         assertNotNull(createdTenant);
-        assertEquals(testTenantName, tenantDto.getName());
+        assertEquals(testTenantName, tenant.getName());
 
-        List<TenantDto> tenantsOfCurrentUser = listTenants(token);
+        List<Tenant> tenantsOfCurrentUser = listTenants(token);
 
         assertEquals(1, tenantsOfCurrentUser.size());
-        assertEquals(tenantDto.getName(), tenantsOfCurrentUser.get(0).getName());
+        assertEquals(tenant.getName(), tenantsOfCurrentUser.get(0).getName());
 
         CreateManagerDto createManagerDto = new CreateManagerDto();
         createManagerDto.setEmail(testManagerEmail);
@@ -66,7 +67,7 @@ class BasicScenariosTest extends AbstractIntegrationTest {
 
         assertNotNull(managerDto);
 
-        User notActivatedManagerUser = userRepository.findByEmail(testManagerEmail).orElseThrow(NullPointerException::new);
+        UserEntity notActivatedManagerUser = userRepository.findByEmail(testManagerEmail).orElseThrow(NullPointerException::new);
 
         assertFalse(notActivatedManagerUser.isActive());
         UUID managerActivationToken = notActivatedManagerUser.getActivationToken();
@@ -76,7 +77,7 @@ class BasicScenariosTest extends AbstractIntegrationTest {
 
         TokenDto managerActivatedToken = activateUser(managerActivationToken, setPasswordToManagerUser);
 
-        User mangerUserActivated = userRepository.findByEmail(testManagerEmail).orElseThrow(NullPointerException::new);
+        UserEntity mangerUserActivated = userRepository.findByEmail(testManagerEmail).orElseThrow(NullPointerException::new);
 
         assertTrue(mangerUserActivated.isActive());
         assertNull(mangerUserActivated.getActivationToken());
@@ -92,8 +93,8 @@ class BasicScenariosTest extends AbstractIntegrationTest {
 
         TokenDto token = login(testUserEmail, testUserPass);
 
-        List<TenantDto> userTenants = listTenants(token);
-        TenantDto tenantDto = userTenants.get(0);
+        List<Tenant> userTenants = listTenants(token);
+        Tenant tenant = userTenants.get(0);
 
         TelegramBotChannelConfig telegramBotChannelDto = new TelegramBotChannelConfig();
 //        telegramBotChannelDto.setTenantDto(tenantDto);

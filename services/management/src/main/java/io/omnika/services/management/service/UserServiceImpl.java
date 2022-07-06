@@ -7,8 +7,8 @@ import io.omnika.common.exceptions.ObjectNotFoundException;
 import io.omnika.common.exceptions.ValidationException;
 import io.omnika.common.exceptions.auth.IncorrectPasswordException;
 import io.omnika.common.exceptions.auth.UserNotFoundException;
-import io.omnika.common.rest.services.management.dto.TenantDto;
-import io.omnika.common.rest.services.management.dto.UserDto;
+import io.omnika.common.rest.services.management.dto.Tenant;
+import io.omnika.common.rest.services.management.dto.User;
 import io.omnika.common.rest.services.management.dto.auth.SetPasswordDto;
 import io.omnika.common.rest.services.management.dto.auth.SignUpDto;
 import io.omnika.common.rest.services.management.dto.auth.SigningDto;
@@ -20,8 +20,8 @@ import io.omnika.common.security.utils.AuthenticationHelper;
 import io.omnika.services.management.converters.UserConverter;
 import io.omnika.services.management.core.service.TenantService;
 import io.omnika.services.management.core.service.UserService;
-import io.omnika.services.management.model.Tenant;
-import io.omnika.services.management.model.User;
+import io.omnika.services.management.model.TenantEntity;
+import io.omnika.services.management.model.UserEntity;
 import io.omnika.services.management.repository.UserRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -48,17 +48,17 @@ class UserServiceImpl implements UserService {
             throw new ValidationException(FieldError.builder().field("email").code(Validation.NOT_UNIQUE).build());
         }
 
-        TenantDto tenant = new TenantDto();
+        Tenant tenant = new Tenant();
         tenant.setName(signUpDto.getTenantName());
         tenant = tenantService.create(tenant);
 
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setEmail(signUpDto.getEmail());
         user.setAuthority(Authority.TENANT_ADMIN);
         user.setActive(false);
         user.setActivationToken(UUID.randomUUID());
         user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
-        user.setTenant(new Tenant(tenant.getId()));
+        user.setTenant(new TenantEntity(tenant.getId()));
         userRepository.save(user);
 
         // here will be sent activation link
@@ -75,10 +75,10 @@ class UserServiceImpl implements UserService {
             throw new ValidationException(FieldError.builder().field("email").code(Validation.NOT_UNIQUE).build());
         }
 
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setEmail(createManagerDto.getEmail());
         user.setActive(false);
-        user.setTenant(new Tenant(tenantId));
+        user.setTenant(new TenantEntity(tenantId));
         user.setAuthority(Authority.MANAGER);
         user.setName(createManagerDto.getName());
         user.setActivationToken(UUID.randomUUID());
@@ -91,7 +91,7 @@ class UserServiceImpl implements UserService {
 
     @Override
     public TokenDto login(SigningDto signingDto) {
-        User user = userRepository.findByEmail(signingDto.getEmail())
+        UserEntity user = userRepository.findByEmail(signingDto.getEmail())
                 .orElseThrow(UserNotFoundException::new);
 
         if (!user.isActive()) {
@@ -108,7 +108,7 @@ class UserServiceImpl implements UserService {
 
     @Override
     public TokenDto activate(UUID activationToken) {
-        User user = userRepository.findByActivationToken(activationToken).orElseThrow(UserNotFoundException::new);
+        UserEntity user = userRepository.findByActivationToken(activationToken).orElseThrow(UserNotFoundException::new);
         user.setActive(true);
         user = userRepository.save(user);
 
@@ -117,7 +117,7 @@ class UserServiceImpl implements UserService {
 
     @Override
     public TokenDto setPassword(UUID activationToken, SetPasswordDto setPasswordDto) {
-        User user = userRepository.findByActivationToken(activationToken).orElseThrow(UserNotFoundException::new);
+        UserEntity user = userRepository.findByActivationToken(activationToken).orElseThrow(UserNotFoundException::new);
 
         // validation for can user set password if it allready present
         // I mean on tenant activation we sending link with only token,
@@ -139,11 +139,11 @@ class UserServiceImpl implements UserService {
 //    }
 //
     @Override
-    public UserDto getCurrent() {
+    public User getCurrent() {
         UserPrincipal userPrincipal = AuthenticationHelper.getAuthenticationDetails();
 
         return userRepository.findById(userPrincipal.getUserId())
                 .map(userConverter::toDto)
-                .orElseThrow(() -> new ObjectNotFoundException(userPrincipal.getUserId(), User.class));
+                .orElseThrow(() -> new ObjectNotFoundException(userPrincipal.getUserId(), UserEntity.class));
     }
 }

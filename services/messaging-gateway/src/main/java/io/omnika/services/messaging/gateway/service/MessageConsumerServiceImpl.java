@@ -1,10 +1,10 @@
 package io.omnika.services.messaging.gateway.service;
 
 import io.omnika.common.exceptions.ObjectNotFoundException;
-import io.omnika.common.rest.services.channels.dto.ChannelMessageDto;
+import io.omnika.common.model.channel.ChannelMessage;
 import io.omnika.services.messaging.gateway.converter.ChannelMessageConverter;
-import io.omnika.services.messaging.gateway.model.ChannelMessage;
-import io.omnika.services.messaging.gateway.model.ChannelSession;
+import io.omnika.services.messaging.gateway.model.ChannelMessageEntity;
+import io.omnika.services.messaging.gateway.model.ChannelSessionEntity;
 import io.omnika.services.messaging.gateway.repository.ChannelMessageRepository;
 import io.omnika.services.messaging.gateway.repository.ChannelSessionRepository;
 import java.util.List;
@@ -29,49 +29,48 @@ public class MessageConsumerServiceImpl {
     // WARNING! If we will throw message in time of messaging gateway starting up
     // it will not process this message, only new received after start up
     @Bean
-    public Consumer<ChannelMessageDto> message() {
+    public Consumer<ChannelMessage> message() {
         return message -> {
             // We have to ignore every of messages already present in database.
             // An artifacts when to gateway incoming present messages can produce instagram channel service
             // TODO: Cache
-            log.warn("[RECEIVED] Received but not processed [{}], channel id", message.getText(), message.getChannelSessionDto().getChannelId());
+//            log.warn("[RECEIVED] Received but not processed [{}], channel id", message.getText(), message.getChannelSession().getChannelId());
 
             if (StringUtils.isNotBlank(message.getInternalId()) && channelMessageRepository.existsByInternalId(message.getInternalId())) {
                 return;
             }
+//
+//            log.warn("[NEW MESSAGE] Received new message with text [{}] channel id [{}] session id [{}]",
+//                    message.getText(),
+//                    message.getChannelSession().getChannelId(),
+//                    message.getChannelSession().getSessionId());
 
-            log.warn("[NEW MESSAGE] Received new message with text [{}] channel id [{}] session id [{}]",
-                    message.getText(),
-                    message.getChannelSessionDto().getChannelId(),
-                    message.getChannelSessionDto().getSessionId());
+            ChannelMessageEntity channelMessage = channelMessageConverter.toDomain(message);
 
-            ChannelMessage channelMessage = channelMessageConverter.toDomain(message);
-
-            ChannelSession channelSession;
+            ChannelSessionEntity channelSession;
             // there should be used some cache, because on every message not so
             // efficient to go to DB and check for a session presents
             // FIXME: exists by id and channel id
-            if (channelSessionRepository
-                    .existsBySessionIdAndChannelId(message.getChannelSessionDto().getSessionId(), message.getChannelSessionDto().getChannelId())) {
-                channelSession = channelSessionRepository
-                        .findBySessionIdAndChannelId(message.getChannelSessionDto().getSessionId(), message.getChannelSessionDto().getChannelId())
-                        .orElseThrow(() -> new ObjectNotFoundException(message.getChannelSessionDto().getSessionId(), ChannelSession.class));
-
-                channelMessage.setChannelSession(channelSession);
-            } else {
-                channelSessionRepository.save(channelMessage.getChannelSession());
-            }
+//            if (channelSessionRepository
+//                    .existsBySessionIdAndChannelId(message.getChannelSession().getSessionId(), message.getChannelSession().getChannelId())) {
+//                channelSession = channelSessionRepository
+//                        .findBySessionIdAndChannelId(message.getChannelSession().getSessionId(), message.getChannelSession().getChannelId())
+//                        .orElseThrow(() -> new ObjectNotFoundException(message.getChannelSession().getSessionId(), ChannelSessionEntity.class));
+//
+//                channelMessage.setChannelSession(channelSession);
+//            } else {
+//                channelSessionRepository.save(channelMessage.getChannelSession());
+//            }
 
             channelMessageRepository.save(channelMessage);
         };
     }
 
     @Transactional(readOnly = true)
-    public List<ChannelMessageDto> allMessages() {
+    public List<ChannelMessage> allMessages() {
         return channelMessageRepository.findAll()
                 .stream()
                 .map(channelMessageConverter::toDto)
                 .collect(Collectors.toList());
     }
-
 }

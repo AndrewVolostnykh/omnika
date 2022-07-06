@@ -5,10 +5,10 @@ import io.jsonwebtoken.Jwts;
 import io.omnika.common.security.core.service.TokenService;
 import io.omnika.common.security.model.Authority;
 import io.omnika.common.security.model.UserPrincipal;
-import java.util.Arrays;
-import java.util.List;
+import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 import javax.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -30,32 +30,52 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String extractToken(HttpServletRequest servletRequest) {
-        return StringUtils.trimToNull(servletRequest.getHeader(tokenRequestHeader));
+        return Optional.ofNullable(servletRequest.getHeader(tokenRequestHeader))
+                .map(authHeaderValue -> StringUtils.substringAfter(StringUtils.trimToEmpty(authHeaderValue), "Bearer "))
+                .orElse(null);
     }
 
     @Override
     public UserPrincipal parseToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(tokenSigningKey)
-                .parseClaimsJws(token).getBody();
+        Claims claims = getAllClaims(token);
 
         UUID userId = UUID.fromString(claims.get(USER_ID_CLAIM, String.class));
         String email = claims.get(USER_EMAIL_CLAIM, String.class);
         UUID tenantId = UUID.fromString(claims.get(TENANT_ID_CLAIM, String.class));
         Authority accountAuthority = Authority.valueOf(claims.get(AUTHORITY_CLAIM, String.class));
 
-        List<GrantedAuthority> authorities = Arrays.stream(Authority.values())
-                .filter(authority -> authority.ordinal() <= accountAuthority.ordinal())
-                .map(authority -> new SimpleGrantedAuthority(authority.name()))
-                .collect(Collectors.toList());
+        GrantedAuthority authority = new SimpleGrantedAuthority(accountAuthority.name());
 
         UserPrincipal principal = new UserPrincipal();
         principal.setUserId(userId);
         principal.setEmail(email);
         principal.setTenantId(tenantId);
-        principal.setAuthorities(authorities);
+        principal.setAuthority(authority);
         principal.setToken(token);
         return principal;
+    }
+
+    protected Claims getAllClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(tokenSigningKey)
+                .parseClaimsJws(token).getBody();
+    }
+
+    @Override
+    public boolean isTokenExpired(String token) {
+        return Instant.now().isAfter(
+                Instant.ofEpochMilli(getClaimFromToken(token, claims -> (Long) claims.get(TokenService.EXPIRATION_DATE)))
+        );
+//        return getClaimFromToken(token, claims -> (Long) claims.get(TokenService.EXPIRATION_DATE)) > Instant.now().isAfter();
+    }
+
+    @Override
+    public UUID getUserId(String token) {
+        return getClaimFromToken(token, claims -> claims.get(USER_ID_CLAIM, UUID.class));
+    }
+
+    private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+        return claimsResolver.apply(getAllClaims(token));
     }
 
 }

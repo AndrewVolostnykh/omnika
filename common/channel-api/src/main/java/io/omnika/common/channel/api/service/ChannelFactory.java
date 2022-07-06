@@ -11,8 +11,4 @@ public interface ChannelFactory<C extends ChannelConfig> {
 
     ChannelType getType();
 
-    static ChannelType aba() {
-        return ChannelType.TELEGRAM_BOT;
-    }
-
 }

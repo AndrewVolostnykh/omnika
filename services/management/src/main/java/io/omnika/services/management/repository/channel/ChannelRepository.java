@@ -2,6 +2,9 @@ package io.omnika.services.management.repository.channel;
 
 import io.omnika.common.model.channel.ChannelType;
 import io.omnika.services.management.model.ChannelEntity;
+import io.omnika.common.rest.services.management.model.ChannelType;
+import io.omnika.services.management.model.Channel;
+import io.omnika.services.management.model.User;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,5 +21,7 @@ public interface ChannelRepository extends JpaRepository<ChannelEntity, Long> {
     Page<ChannelEntity> findByChannelType(ChannelType channelType, Pageable pageable);
 
     List<ChannelEntity> findAllByTenantId(UUID tenantId);
+
+    List<Channel> findAllByAssignedUsersContainsAndTenantId(User user, UUID tenantId);
 
 }

@@ -16,8 +16,11 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -39,6 +42,14 @@ public class ChannelEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tenant_id")
     private TenantEntity tenant;
+
+    @ManyToMany
+    @JoinTable(
+            name = "assigned_channels",
+            joinColumns = @JoinColumn(name = "chanel_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<UserEntity> assignedUsers;
 
     public ChannelType getChannelType() {
         return channelType;

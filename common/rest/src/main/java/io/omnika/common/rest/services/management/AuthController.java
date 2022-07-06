@@ -8,6 +8,7 @@ import io.omnika.common.rest.services.management.dto.manager.CreateManagerDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +24,7 @@ public interface AuthController {
     void signUp(@RequestBody SignUpDto signingDto);
 
     @PostMapping("/sign-up-manager")
-    void signUpManger(CreateManagerDto createManagerDto);
+    void signUpManager(CreateManagerDto createManagerDto);
 
     @PostMapping("/set-password/{activationToken}")
     TokenDto setPassword(@PathVariable UUID activationToken, @RequestBody SetPasswordDto setPasswordDto);
@@ -33,4 +34,7 @@ public interface AuthController {
 
     @PostMapping("/login")
     TokenDto login(@RequestBody SigningDto signingDto);
+
+    @GetMapping("/refresh")
+    TokenDto refresh(HttpServletRequest request);
 }

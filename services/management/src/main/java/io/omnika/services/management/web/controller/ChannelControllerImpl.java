@@ -18,9 +18,13 @@ public class ChannelControllerImpl extends BaseController implements ChannelCont
     private final ChannelService channelService;
 
     @Override
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    public Channel create(@Valid Channel channel) {
-        return channelService.create(getTenantId(), channel);
+    public Channel createChannel(@Valid Channel channel) {
+        return channelService.createChannel(getTenantId(), channel);
+    }
+
+    @Override
+    public Channel updateChannel(Channel channel) {
+        return null;
     }
 
     @Override

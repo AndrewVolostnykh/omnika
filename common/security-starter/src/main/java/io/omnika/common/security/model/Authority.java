@@ -1,5 +1,5 @@
 package io.omnika.common.security.model;
 
 public enum Authority {
-    TENANT_ADMIN, MANAGER, ANONYMOUS
+    SYSADMIN, TENANT_ADMIN, MANAGER, ANONYMOUS
 }

@@ -15,4 +15,8 @@ public class Topics {
         return "get-channels";
     }
 
+    public static String newChannelMessages() {
+        return "new-channel-messages";
+    }
+
 }

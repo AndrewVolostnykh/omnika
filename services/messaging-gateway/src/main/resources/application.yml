@@ -31,4 +31,4 @@ security:
   token:
     signing_key: ${SECURITY_TOKEN_SIGNING_KEY:abababa}
     lifetime: ${SECURITY_TOKEN_LIFETIME:86400}  # 24 hours by default
-    request_header: ${SECURITY_TOKEN_REQUEST_HEADER:X-Authorization}
+    request_header: ${SECURITY_TOKEN_REQUEST_HEADER:Authorization}

@@ -39,4 +39,12 @@ security:
     signing_key: ${SECURITY_TOKEN_SIGNING_KEY:abababa}
     lifetime: ${SECURITY_TOKEN_LIFETIME:7200}  # 2 hours by default
     refresh_lifetime: ${SECURITY_REFRESH_TOKEN_LIFETIME:604800} # 7 days by default
-    request_header: ${SECURITY_TOKEN_REQUEST_HEADER:X-Authorization}
+    request_header: ${SECURITY_TOKEN_REQUEST_HEADER:Authorization}
+  sysadmin:
+    email: sysadmin@omnika.io
+    password: sysadmin
+
+logging:
+  level:
+    org.apache.kafka: WARN
+    io.omnika.common.ipc: DEBUG

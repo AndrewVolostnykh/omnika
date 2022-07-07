@@ -65,7 +65,7 @@ public class AuthControllerImpl extends BaseController implements AuthController
     @Override
     public TokenDto refresh(HttpServletRequest request) {
         UUID userId = tokenService.getUserId(tokenService.extractToken(request));
-        return securityService.refresh(userService.get(userId));
+        return securityService.refresh(userService.getUserById(userId));
     }
 //
 //    @Override

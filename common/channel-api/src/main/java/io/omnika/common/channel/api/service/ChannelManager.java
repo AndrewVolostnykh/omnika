@@ -44,6 +44,7 @@ public class ChannelManager {
     }
 
     private void handleNewChannel(ChannelResponse channelResponse) {
+        log.info("Handling new channel: {}", channelResponse);
         UUID tenantId = channelResponse.getTenantId();
         UUID channelId = channelResponse.getChannelId();
         ChannelConfig config = channelResponse.getChannelConfig();

@@ -1,16 +1,14 @@
-package io.omnika.services.management.converters.mappers;
+package io.omnika.services.management.mappers;
 
 import io.omnika.common.core.converters.BasicEntityMapper;
 import io.omnika.common.rest.services.management.dto.User;
 import io.omnika.services.management.model.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Component;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserMapper extends BasicEntityMapper<UserEntity, User> {
-
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     @Override
     @Mapping(target = "tenantId", expression = "java(userEntity.getTenant().getId())")

@@ -1,4 +1,4 @@
-package io.omnika.common.rest.services.channels.dto;
+package io.omnika.common.model.channel;
 
 import lombok.Data;
 

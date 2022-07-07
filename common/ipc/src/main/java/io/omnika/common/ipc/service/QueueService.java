@@ -1,6 +1,7 @@
 package io.omnika.common.ipc.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -16,6 +17,7 @@ import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class QueueService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
@@ -50,23 +52,29 @@ public class QueueService {
             messageBuilder.setHeader(KafkaHeaders.REPLY_TOPIC, replyTopic);
         }
         messageBuilder.setHeader(KafkaHeaders.REPLY_PARTITION, discoveryService.getInstanceIndex());
+        log.debug("Pushing message to topic {} for partition {}: {}", topic, partitionIndex, payload);
         kafkaTemplate.send(messageBuilder.build());
     }
 
 
     public <T> void subscribe(String topic, Consumer<T> processor) {
+        log.debug("Subscribing to topic {}", topic);
         this.<T>registerConsumer(topic, message -> {
             T payload = message.value();
+            log.debug("Received new message for topic {}: {}", topic, payload);
             processor.accept(payload);
         });
     }
 
     public <T> void subscribeAndRespond(String topic, BiConsumer<T, Consumer<Object>> processor) {
+        log.debug("Subscribing to topic {}", topic);
         this.<T>registerConsumer(topic, message -> {
             T payload = message.value();
+            log.debug("Received new message for topic {}: {}", topic, payload);
             processor.accept(payload, response -> {
                 String replyTopic = getHeader(message, KafkaHeaders.REPLY_TOPIC);
                 Integer replyPartition = Integer.parseInt(getHeader(message, KafkaHeaders.REPLY_PARTITION));
+                log.debug("Pushing reply to topic {} for partition {}: {}", replyTopic, replyPartition, response);
                 sendMessage(replyTopic, response, replyPartition);
             });
         });

@@ -1,5 +1,6 @@
 package io.omnika.common.channel.api.service;
 
+import io.omnika.common.ipc.config.Topics;
 import io.omnika.common.ipc.service.QueueService;
 import io.omnika.common.ipc.service.ServiceType;
 import io.omnika.common.model.channel.ChannelConfig;
@@ -35,7 +36,7 @@ public abstract class ChannelService<C extends ChannelConfig> {
                 .sessionId(sessionId)
                 .text(text)
                 .build();
-        queueService.sendMessage(ServiceType.MESSAGING_GATEWAY, "new-channel-messages", channelMessage, channelId);
+        queueService.sendMessage(ServiceType.MESSAGING_GATEWAY, Topics.newChannelMessages(), channelMessage, channelId);
     }
 
     public void stop() throws Exception {}

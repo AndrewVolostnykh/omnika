@@ -17,19 +17,20 @@ import io.omnika.common.rest.services.management.dto.manager.CreateManagerDto;
 import io.omnika.common.security.model.Authority;
 import io.omnika.common.security.model.UserPrincipal;
 import io.omnika.common.security.utils.AuthenticationHelper;
-import io.omnika.services.management.converters.UserConverter;
 import io.omnika.services.management.core.service.TenantService;
 import io.omnika.services.management.core.service.UserService;
+import io.omnika.services.management.mappers.UserMapper;
 import io.omnika.services.management.model.TenantEntity;
 import io.omnika.services.management.model.UserEntity;
 import io.omnika.services.management.repository.UserRepository;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -39,12 +40,11 @@ class UserServiceImpl implements UserService {
     private final TokenService tokenService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserConverter userConverter;
+    private final UserMapper userMapper;
     private final TenantService tenantService;
 
     @Override
     public void signUp(SignUpDto signUpDto) {
-
         if (userRepository.existsByEmail(signUpDto.getEmail())) {
             // FIXME: remove this code duplication. U can use custom validators for checking
             // email for uniq
@@ -53,7 +53,7 @@ class UserServiceImpl implements UserService {
 
         Tenant tenant = new Tenant();
         tenant.setName(signUpDto.getTenantName());
-        tenant = tenantService.create(tenant);
+        tenant = tenantService.createTenant(tenant);
 
         UserEntity user = new UserEntity();
         user.setEmail(signUpDto.getEmail());
@@ -94,15 +94,16 @@ class UserServiceImpl implements UserService {
 
     @Override
     public TokenDto login(SigningDto signingDto) {
-        UserEntity user = userRepository.findByEmail(signingDto.getEmail())
+        UserEntity userEntity = userRepository.findByEmail(signingDto.getEmail())
                 .orElseThrow(UserNotFoundException::new);
 
-        if (!user.isActive()) {
+        if (!userEntity.isActive()) {
             // FIXME: it should not be validation, but authentication
             throw new ValidationException(Auth.USER_NOT_ACTIVE);
         }
 
-        if (passwordEncoder.matches(signingDto.getPassword(), user.getPassword())) {
+        User user = userMapper.toDto(userEntity);
+        if (passwordEncoder.matches(signingDto.getPassword(), userEntity.getPassword())) {
             return new TokenDto(tokenService.createToken(user), tokenService.createRefreshToken(user));
         } else {
             throw new IncorrectPasswordException();
@@ -113,9 +114,9 @@ class UserServiceImpl implements UserService {
     public TokenDto activate(UUID activationToken) {
         UserEntity user = userRepository.findByActivationToken(activationToken).orElseThrow(UserNotFoundException::new);
         user.setActive(true);
-        user = userRepository.save(user);
+        User saved = userMapper.toDto(userRepository.save(user));
 
-        return new TokenDto(tokenService.createToken(user), tokenService.createToken(user));
+        return new TokenDto(tokenService.createToken(saved), tokenService.createToken(saved));
     }
 
     @Override
@@ -130,47 +131,32 @@ class UserServiceImpl implements UserService {
         user.setActive(true);
         user.setActivationToken(null);
 
-        User saved = userRepository.save(user);
+        User saved = userMapper.toDto(userRepository.save(user));
 
         return new TokenDto(tokenService.createToken(saved), tokenService.createRefreshToken(saved));
     }
 
-//    @Override
-//    public UserDto get(Long id) {
-//        return userConverter.toDto(
-//                userRepository.findById(id)
-//                        .orElseThrow(() -> new ObjectNotFoundException(id, User.class))
-//        );
-//    }
-//
     @Override
-    public User getCurrent() {
+    public User getCurrentUser() {
         UserPrincipal userPrincipal = AuthenticationHelper.getAuthenticationDetails();
 
         return userRepository.findById(userPrincipal.getUserId())
-                .map(userConverter::toDto)
+                .map(userMapper::toDto)
                 .orElseThrow(() -> new ObjectNotFoundException(userPrincipal.getUserId(), UserEntity.class));
     }
 
     @Override
-    public UserDto get(UUID id) {
+    public List<User> getUsersByTenantIdAndAuthority(UUID tenantId, Authority authority) {
+        return userRepository.findAllByAuthorityAndTenantId(authority, tenantId).stream()
+                .map(userMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public User getUserById(UUID id) {
         return userRepository.findById(id)
-                .map(userConverter::toDto)
+                .map(userMapper::toDto)
                 .orElseThrow(() -> new ObjectNotFoundException(id, User.class));
     }
 
-    @Override
-    public List<UserDto> list(UUID tenantId) {
-        return userRepository.findAllByTenantId(tenantId).stream()
-                .map(userConverter::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<UserDto> listManagers(UUID tenantId) {
-        return userRepository.findAllByAuthorityAndTenantId(Authority.MANAGER, tenantId)
-                .stream()
-                .map(userConverter::toDto)
-                .collect(Collectors.toList());
-    }
 }

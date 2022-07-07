@@ -2,16 +2,14 @@ package io.omnika.services.management.repository.channel;
 
 import io.omnika.common.model.channel.ChannelType;
 import io.omnika.services.management.model.ChannelEntity;
-import io.omnika.common.rest.services.management.model.ChannelType;
-import io.omnika.services.management.model.Channel;
-import io.omnika.services.management.model.User;
-import java.util.List;
-import java.util.UUID;
-
+import io.omnika.services.management.model.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface ChannelRepository extends JpaRepository<ChannelEntity, Long> {
@@ -22,6 +20,6 @@ public interface ChannelRepository extends JpaRepository<ChannelEntity, Long> {
 
     List<ChannelEntity> findAllByTenantId(UUID tenantId);
 
-    List<Channel> findAllByAssignedUsersContainsAndTenantId(User user, UUID tenantId);
+    List<ChannelEntity> findAllByAssignedUsersContainsAndTenantId(UserEntity user, UUID tenantId);
 
 }

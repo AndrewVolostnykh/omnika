@@ -21,3 +21,8 @@ spring:
         spring.json.trusted.packages: '*'
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+logging:
+  level:
+    org.apache.kafka: WARN
+    io.omnika.common.ipc: DEBUG

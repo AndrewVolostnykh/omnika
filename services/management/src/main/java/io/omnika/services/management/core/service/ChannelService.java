@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface ChannelService {
 
-    Channel create(UUID tenantId, Channel channel);
+    Channel createChannel(UUID tenantId, Channel channel);
 
     List<Channel> getChannelsByTenantId(UUID tenantId);
 

@@ -12,6 +12,7 @@ public class User {
     private UUID id;
     private String name;
     private String email;
+    private boolean active;
     private UUID activationToken;
     private Authority authority;
     private UUID tenantId;

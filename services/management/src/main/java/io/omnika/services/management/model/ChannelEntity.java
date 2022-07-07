@@ -43,7 +43,7 @@ public class ChannelEntity extends BaseEntity {
     @JoinColumn(name = "tenant_id")
     private TenantEntity tenant;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "assigned_channels",
             joinColumns = @JoinColumn(name = "chanel_id"),

@@ -1,22 +1,22 @@
 package io.omnika.services.messaging.gateway.service;
 
-import io.omnika.common.exceptions.ObjectNotFoundException;
 import io.omnika.common.model.channel.ChannelMessage;
-import io.omnika.services.messaging.gateway.converter.ChannelMessageConverter;
+import io.omnika.services.messaging.gateway.mappers.ChannelMessageMapper;
 import io.omnika.services.messaging.gateway.model.ChannelMessageEntity;
 import io.omnika.services.messaging.gateway.model.ChannelSessionEntity;
 import io.omnika.services.messaging.gateway.repository.ChannelMessageRepository;
 import io.omnika.services.messaging.gateway.repository.ChannelSessionRepository;
 import io.omnika.services.messaging.gateway.repository.SenderRepository;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,7 +25,7 @@ public class MessageConsumerServiceImpl {
 
     private final ChannelSessionRepository channelSessionRepository;
     private final ChannelMessageRepository channelMessageRepository;
-    private final ChannelMessageConverter channelMessageConverter;
+    private final ChannelMessageMapper channelMessageMapper;
     private final SenderRepository senderRepository;
 
     // WARNING! If we will throw message in time of messaging gateway starting up
@@ -45,7 +45,7 @@ public class MessageConsumerServiceImpl {
 //                    message.getChannelSession().getChannelId(),
 //                    message.getChannelSession().getSessionId());
 
-            ChannelMessageEntity channelMessage = channelMessageConverter.toDomain(message);
+            ChannelMessageEntity channelMessage = channelMessageMapper.toDomain(message);
 
             ChannelSessionEntity channelSession;
             // TODO: cache
@@ -69,7 +69,7 @@ public class MessageConsumerServiceImpl {
     public List<ChannelMessage> allMessages() {
         return channelMessageRepository.findAll()
                 .stream()
-                .map(channelMessageConverter::toDto)
+                .map(channelMessageMapper::toDto)
                 .collect(Collectors.toList());
     }
 }

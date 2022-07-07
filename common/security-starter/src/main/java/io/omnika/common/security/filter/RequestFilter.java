@@ -1,11 +1,10 @@
 package io.omnika.common.security.filter;
 
-import io.omnika.common.exceptions.ExceptionCodes.Auth;
 import io.omnika.common.security.core.service.TokenService;
+import io.omnika.common.security.model.Authority;
 import io.omnika.common.security.model.UserPrincipal;
 import java.io.IOException;
 import java.util.List;
-import javax.security.sasl.AuthenticationException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -13,8 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -33,12 +34,8 @@ public class RequestFilter extends OncePerRequestFilter {
         Authentication authentication = null;
 
         // TODO: add check for an expiration of token
-        if (StringUtils.isNotEmpty(token)) {
+        if (StringUtils.isNotEmpty(token) && !tokenService.isTokenExpired(token)) {
             UserPrincipal principal;
-
-            if (tokenService.isTokenExpired(token)) {
-                throw new AuthenticationException(Auth.TOKEN_EXPIRED);
-            }
 
             try {
                 principal = tokenService.parseToken(token);
@@ -47,6 +44,8 @@ public class RequestFilter extends OncePerRequestFilter {
                 log.error("Error on processing auth token occurred", e);
                 return;
             }
+        } else {
+            authentication = new AnonymousAuthenticationToken("some key", new UserPrincipal(), List.of(new SimpleGrantedAuthority(Authority.ANONYMOUS.name())));
         }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);

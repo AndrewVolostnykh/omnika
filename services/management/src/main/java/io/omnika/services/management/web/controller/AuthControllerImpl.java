@@ -2,6 +2,7 @@ package io.omnika.services.management.web.controller;
 
 import io.omnika.common.rest.controller.BaseController;
 import io.omnika.common.rest.services.management.AuthController;
+import io.omnika.common.rest.services.management.dto.UserDto;
 import io.omnika.common.rest.services.management.dto.auth.SetPasswordDto;
 import io.omnika.common.rest.services.management.dto.auth.SignUpDto;
 import io.omnika.common.rest.services.management.dto.auth.SigningDto;
@@ -32,9 +33,9 @@ public class AuthControllerImpl extends BaseController implements AuthController
     }
 
     @Override
-    @PreAuthorize("hasRole('TENANT_ADMIN')")
-    public void signUpManger(@Valid CreateManagerDto createManagerDto) {
-        userService.signUpManager(getPrincipal().getTenantId(), createManagerDto);
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
+    public UserDto signUpManger(@Valid CreateManagerDto createManagerDto) {
+        return userService.signUpManager(getPrincipal().getTenantId(), createManagerDto);
     }
 
     @GetMapping("/test")

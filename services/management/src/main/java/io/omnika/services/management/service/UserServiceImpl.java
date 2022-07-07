@@ -71,7 +71,7 @@ class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void signUpManager(UUID tenantId, CreateManagerDto createManagerDto) {
+    public UserDto signUpManager(UUID tenantId, CreateManagerDto createManagerDto) {
         // FIXME: remove this code duplication. U can use custom validators for checking
         // email for uniq
         if (userRepository.existsByEmail(createManagerDto.getEmail())) {
@@ -86,10 +86,12 @@ class UserServiceImpl implements UserService {
         user.setName(createManagerDto.getName());
         user.setActivationToken(UUID.randomUUID());
 
-        userRepository.save(user);
+        user = userRepository.save(user);
 
         // here will be sent password setting link
         log.warn("Activating manager [{}]. User this token to activate and set pass [{}]", user.getEmail(), user.getActivationToken());
+
+        return userConverter.toDto(user);
     }
 
     @Override

@@ -13,7 +13,7 @@ public interface UserService {
 
     void signUp(SignUpDto signUpDto);
 
-    void signUpManager(UUID tenantId, CreateManagerDto createManagerDto);
+    UserDto signUpManager(UUID tenantId, CreateManagerDto createManagerDto);
 
     TokenDto login(SigningDto signingDto);
 

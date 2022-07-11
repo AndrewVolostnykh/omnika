@@ -1,4 +1,4 @@
-package io.omnika.common.ipc.service;
+package io.omnika.common.model.channel;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

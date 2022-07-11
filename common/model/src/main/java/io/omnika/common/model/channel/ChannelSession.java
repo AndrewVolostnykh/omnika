@@ -15,10 +15,9 @@ import java.util.UUID;
 public class ChannelSession {
 
     private UUID id;
-    private LocalDateTime receivedAt;
-    private String sessionId;
+    private String externalId;
     private UUID channelId;
     private UUID tenantId;
     private ChannelType channelType;
-    private SenderDto sender;
+
 }

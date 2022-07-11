@@ -1,6 +1,5 @@
 package io.omnika.common.ipc.dto;
 
-import io.omnika.common.model.channel.ChannelConfig;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,8 +11,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ChannelResponse {
-    private UUID tenantId;
+public class OutboundChannelMessage {
+    private String externalSessionId;
+    private String text;
     private UUID channelId;
-    private ChannelConfig channelConfig;
 }

@@ -9,16 +9,16 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class InstagramChannelFactory extends ChannelFactory<InstagramChannelConfig> {
+public class InstagramChannelFactory implements ChannelFactory<InstagramChannelConfig> {
 
     @Lookup
     @Override
-    protected InstagramChannelService createNewChannel(UUID tenantId, UUID channelId, InstagramChannelConfig config) {
+    public InstagramChannelService createNewChannel(UUID tenantId, UUID channelId, InstagramChannelConfig config) {
         return null;
     }
 
     @Override
-    protected ChannelType getType() {
+    public ChannelType getType() {
         return ChannelType.INSTAGRAM;
     }
 

@@ -25,7 +25,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
-        channelService.onNewMessage(message.getChatId().toString(), message.getText());
+        channelService.handleNewMessage(message);
     }
 
     public void sendMessage(String chatId, String text) throws TelegramApiException {

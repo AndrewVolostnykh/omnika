@@ -7,16 +7,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Topics {
 
-    public static String newChannels(ChannelType channelType) {
-        return "new-channels." + channelType.name().toLowerCase();
+    public static String channelEvents(ChannelType channelType) {
+        return "channel-events." + channelType.name().toLowerCase();
     }
 
     public static String getChannels() {
         return "get-channels";
     }
 
-    public static String newChannelMessages() {
-        return "new-channel-messages";
+    public static String inboundChannelMessages() {
+        return "inbound-channel-messages";
+    }
+
+    public static String outboundChannelMessages() {
+        return "outbound-channel-messages";
     }
 
 }

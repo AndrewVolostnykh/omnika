@@ -1,4 +1,4 @@
-package io.omnika.services.management.service;
+package io.omnika.services.management.utils;
 
 import io.omnika.services.management.core.service.UserService;
 import lombok.RequiredArgsConstructor;

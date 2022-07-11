@@ -1,4 +1,4 @@
-package io.omnika.common.ipc.service;
+package io.omnika.common.ipc.config;
 
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.kafka.annotation.KafkaListener;

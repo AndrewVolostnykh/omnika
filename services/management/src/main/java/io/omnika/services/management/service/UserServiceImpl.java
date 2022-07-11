@@ -43,7 +43,7 @@ class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final TenantService tenantService;
 
-    @Override
+    @Override // todo: do in transaction
     public void signUp(SignUpDto signUpDto) {
         if (userRepository.existsByEmail(signUpDto.getEmail())) {
             // FIXME: remove this code duplication. U can use custom validators for checking
@@ -51,6 +51,7 @@ class UserServiceImpl implements UserService {
             throw new ValidationException(FieldError.builder().field("email").code(Validation.NOT_UNIQUE).build());
         }
 
+        // todo: refactor
         Tenant tenant = new Tenant();
         tenant.setName(signUpDto.getTenantName());
         tenant = tenantService.createTenant(tenant);

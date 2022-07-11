@@ -10,18 +10,22 @@ spring:
 
   datasource:
     #    driver-class-name: org.postgresql.Driver
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/omnika-messaging-gateway-service}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/omnika_messaging_gateway}
     username: ${DATABASE_USERNAME:postgres}
     password: ${DATABASE_PASSWORD:postgres}
   jpa:
     hibernate:
       ddl-auto: ${HIBERNATE_DDL_MODE:update}
 
-  rabbitmq:
-    host: ${RABBITMQ_HOST:localhost}
-    port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:guest}
-    password: ${RABBITMQ_PASSWORD:guest}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: messaging-gateway-consumer-group
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: '*'
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
   cloud:
     zookeeper:
@@ -32,3 +36,8 @@ security:
     signing_key: ${SECURITY_TOKEN_SIGNING_KEY:abababa}
     lifetime: ${SECURITY_TOKEN_LIFETIME:86400}  # 24 hours by default
     request_header: ${SECURITY_TOKEN_REQUEST_HEADER:Authorization}
+
+logging:
+  level:
+    org.apache.kafka: WARN
+    io.omnika.common.ipc: DEBUG

@@ -2,6 +2,7 @@ package io.omnika.common.ipc.service;
 
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
+import io.omnika.common.model.channel.ServiceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class PartitionService {
     private static final HashFunction HASH_FUNCTION = Hashing.murmur3_32();
 
     public int getPartitionIndex(ServiceType serviceType, Object partitionKey) {
-        return hash(partitionKey) % discoveryService.getInstancesCount(serviceType);
+        return hash(partitionKey) % discoveryService.getInstancesCount(serviceType); // fixme: when service is down
     }
 
     public boolean isMyPartition(Object partitionKey) {

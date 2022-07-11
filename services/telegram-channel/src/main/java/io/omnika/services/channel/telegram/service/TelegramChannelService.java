@@ -1,12 +1,15 @@
 package io.omnika.services.channel.telegram.service;
 
 import io.omnika.common.channel.api.service.ChannelService;
+import io.omnika.common.ipc.dto.InboundChannelMessage;
+import io.omnika.common.ipc.dto.OutboundChannelMessage;
 import io.omnika.common.model.channel.ChannelType;
 import io.omnika.common.model.channel.TelegramBotChannelConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.UUID;
 
@@ -29,8 +32,18 @@ public class TelegramChannelService extends ChannelService<TelegramBotChannelCon
     }
 
     @Override
-    protected void sendMessage(String sessionId, String text) throws Exception {
-        botService.sendMessage(sessionId, text);
+    protected void sendMessage(OutboundChannelMessage message) throws Exception {
+        botService.sendMessage(message.getExternalSessionId(), message.getText());
+    }
+
+    protected void handleNewMessage(Message telegramMessage) {
+        InboundChannelMessage message = InboundChannelMessage.builder()
+                .id(telegramMessage.getMessageId().toString())
+                .sessionId(telegramMessage.getChatId().toString())
+                .userId(telegramMessage.getFrom().getId().toString())
+                .text(telegramMessage.getText())
+                .build();
+        onNewMessage(message);
     }
 
     @Override

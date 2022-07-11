@@ -1,9 +1,7 @@
-package io.omnika.services.management.web.openapi;
+package io.omnika.common.rest.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -13,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @OpenAPIDefinition(
         info = @Info(
-                title = "Omnika management service",
+                title = "Omnika management service", // fixme
                 description = "Management of application. This service give us endpoints to "
                         + "create user, create tenant for it and managers, create channels and "
                         + "configuring it")

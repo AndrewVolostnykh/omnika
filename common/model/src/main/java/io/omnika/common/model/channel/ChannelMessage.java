@@ -14,9 +14,11 @@ import lombok.NoArgsConstructor;
 public class ChannelMessage {
 
     private UUID id;
+    private ChannelMessageType messageType;
     private String text;
     private LocalDateTime receivedAt;
-    private String internalId; // for now needed only for instagram. but take aware that will be nice to write it also for telegram
-    private String sessionId;
+    private UUID channelSessionId;
+    private UUID senderId;
+    private String externalId; // for now needed only for instagram. but take aware that will be nice to write it also for telegram
 
 }

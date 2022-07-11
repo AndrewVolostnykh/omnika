@@ -10,6 +10,8 @@ import com.github.instagram4j.instagram4j.requests.direct.DirectThreadsBroadcast
 import com.github.instagram4j.instagram4j.requests.direct.DirectThreadsBroadcastRequest.BroadcastTextPayload;
 import com.github.instagram4j.instagram4j.requests.direct.DirectThreadsMarkItemSeenRequest;
 import io.omnika.common.channel.api.service.ChannelService;
+import io.omnika.common.ipc.dto.InboundChannelMessage;
+import io.omnika.common.ipc.dto.OutboundChannelMessage;
 import io.omnika.common.model.channel.ChannelType;
 import io.omnika.common.model.channel.InstagramChannelConfig;
 import lombok.SneakyThrows;
@@ -66,8 +68,8 @@ public class InstagramChannelService extends ChannelService<InstagramChannelConf
     }
 
     @Override
-    protected void sendMessage(String sessionId, String text) throws Exception {
-        BroadcastTextPayload broadcastTextPayload = new BroadcastTextPayload(text, sessionId);
+    protected void sendMessage(OutboundChannelMessage message) throws Exception {
+        BroadcastTextPayload broadcastTextPayload = new BroadcastTextPayload(message.getText(), message.getExternalSessionId());
         DirectThreadsBroadcastRequest directThreadsBroadcastRequest = new DirectThreadsBroadcastRequest(broadcastTextPayload);
         igClient.sendRequest(directThreadsBroadcastRequest).exceptionally(exception -> {
             log.error("Exception on sending message to telegram", exception);
@@ -92,43 +94,38 @@ public class InstagramChannelService extends ChannelService<InstagramChannelConf
                         .thenAccept(response -> {
                             Inbox receivedInbox = response.getInbox();
                             log.warn("Inbox received. Number of threads [{}]", receivedInbox.getThreads().size());
-                            if (inboxHaveUnreadThreads(receivedInbox)) {
-                                receivedInbox.getThreads().stream()
-                                        .filter(this::threadIsUnreadAndPrivate)
-                                        .collect(Collectors.toMap(IGThread::getThread_id, IGThread::getItems))
-                                        .forEach((key, value) -> value.stream()
-                                                .filter(this::itemReceivedAndHaveTextType)
-                                                .forEach(item -> {
-                                                    igClient.sendRequest(
-                                                            new DirectThreadsMarkItemSeenRequest(
-                                                                    key,
-                                                                    item.getItem_id()));
-                                                    log.warn("NEW MESSAGE RECEIVED!!! [{}]", ((ThreadTextItem) item).getText());
-                                                    onNewMessage(key, ((ThreadTextItem) item).getText());
-
-//                                                    ChannelSession channelSession = new ChannelSession();
-//                                                    channelSession.setSessionId(key);
-//                                                    channelSession.setChannelType(ChannelType.INSTAGRAM);
-//                                                    channelSession.setChannelId(channel.getId());
-//                                                    channelSession.setTenantId(channel.getTenantId());
-//
-//                                                    ChannelMessageDto channelMessageDto = new ChannelMessageDto();
-//                                                    // FIXME: temp. On adding supporting of media we will need to process here data...
-//                                                    channelMessageDto.setText();
-//                                                    channelMessageDto.setChannelSession(channelSession);
-//                                                    channelMessageDto.setInternalId(item.getItem_id());
-//
-//                                                    localCache.add(item.getItem_id());
-
-//                                                    streamBridge.send(RECEIVED_MESSAGE_EXCHANGE, channelMessageDto);
-                                                }));
+                            if (!inboxHaveUnreadThreads(receivedInbox)) {
+                                return;
                             }
+                            receivedInbox.getThreads().stream()
+                                    .filter(this::threadIsUnreadAndPrivate)
+                                    .collect(Collectors.toMap(IGThread::getThread_id, IGThread::getItems))
+                                    .forEach((key, value) -> value.stream()
+                                            .filter(this::itemReceivedAndHaveTextType)
+                                            .forEach(item -> {
+                                                igClient.sendRequest(
+                                                        new DirectThreadsMarkItemSeenRequest(
+                                                                key,
+                                                                item.getItem_id()));
+                                                log.warn("NEW MESSAGE RECEIVED!!! [{}]", ((ThreadTextItem) item).getText());
+                                                handleNewMessage(key, (ThreadTextItem) item);
+                                            }));
                         });
             });
             // FIXME: first problem is a presence of hardcoded time to update.
             // FIXME: Second problem that it is an infinite loop. Use MQTT library to fix it
             Thread.sleep(5000);
         }
+    }
+
+    private void handleNewMessage(String key, ThreadTextItem item) {
+        InboundChannelMessage message = InboundChannelMessage.builder()
+                .id(item.getItem_id())
+                .sessionId(key)
+                .text(item.getText())
+                .build();
+        onNewMessage(message);
+        // localCache.add(item.getItem_id());
     }
 
     // FIXME: temporary. For now we receiving only text, but in future it should be media also (but for now only text)

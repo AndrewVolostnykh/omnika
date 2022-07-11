@@ -24,7 +24,7 @@ public interface AuthController {
     void signUp(@RequestBody SignUpDto signingDto);
 
     @PostMapping("/sign-up-manager")
-    void signUpManager(CreateManagerDto createManagerDto);
+    void signUpManager(CreateManagerDto createManagerDto); // TODO [viacheslav]: remove
 
     @PostMapping("/set-password/{activationToken}")
     TokenDto setPassword(@PathVariable UUID activationToken, @RequestBody SetPasswordDto setPasswordDto);

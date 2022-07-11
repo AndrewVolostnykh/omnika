@@ -1,5 +1,6 @@
 package io.omnika.common.ipc.service;
 
+import io.omnika.common.model.channel.ServiceType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -50,8 +51,8 @@ public class QueueService {
         }
         if (replyTopic != null) {
             messageBuilder.setHeader(KafkaHeaders.REPLY_TOPIC, replyTopic);
+            messageBuilder.setHeader(KafkaHeaders.REPLY_PARTITION, discoveryService.getInstanceIndex());
         }
-        messageBuilder.setHeader(KafkaHeaders.REPLY_PARTITION, discoveryService.getInstanceIndex());
         log.debug("Pushing message to topic {} for partition {}: {}", topic, partitionIndex, payload);
         kafkaTemplate.send(messageBuilder.build());
     }

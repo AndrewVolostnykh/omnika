@@ -1,11 +1,12 @@
 package io.omnika.common.channel.api.service;
 
 import io.omnika.common.ipc.config.Topics;
+import io.omnika.common.ipc.dto.InboundChannelMessage;
+import io.omnika.common.ipc.dto.OutboundChannelMessage;
 import io.omnika.common.ipc.service.QueueService;
-import io.omnika.common.ipc.service.ServiceType;
 import io.omnika.common.model.channel.ChannelConfig;
-import io.omnika.common.model.channel.ChannelMessage;
 import io.omnika.common.model.channel.ChannelType;
+import io.omnika.common.model.channel.ServiceType;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,14 +30,13 @@ public abstract class ChannelService<C extends ChannelConfig> {
 
     public abstract void init() throws Exception;
 
-    protected abstract void sendMessage(String sessionId, String text) throws Exception; // todo: take common interface as a message request
+    protected abstract void sendMessage(OutboundChannelMessage message) throws Exception;
 
-    public final void onNewMessage(String sessionId, String text) {
-        ChannelMessage channelMessage = ChannelMessage.builder()
-                .sessionId(sessionId)
-                .text(text)
-                .build();
-        queueService.sendMessage(ServiceType.MESSAGING_GATEWAY, Topics.newChannelMessages(), channelMessage, channelId);
+    public final void onNewMessage(InboundChannelMessage message) {
+        message.setChannelType(getType());
+        message.setChannelId(channelId);
+        message.setTenantId(tenantId);
+        queueService.sendMessage(ServiceType.MESSAGING_GATEWAY, Topics.inboundChannelMessages(), message, channelId);
     }
 
     public void stop() throws Exception {}

@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ChannelSessionRepository extends JpaRepository<ChannelSessionEntity, UUID> {
 
-    boolean existsBySessionIdAndChannelId(String sessionId, UUID channelId);
+    Optional<ChannelSessionEntity> findByExternalIdAndChannelId(String sessionId, UUID channelId);
 
-    Optional<ChannelSessionEntity> findBySessionIdAndChannelId(String sessionId, UUID channelId);
+    Optional<ChannelSessionEntity> findByTenantIdAndId(UUID tenantId, UUID id);
 
 }

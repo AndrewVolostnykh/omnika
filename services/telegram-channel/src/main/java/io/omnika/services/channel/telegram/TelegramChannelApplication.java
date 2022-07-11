@@ -3,9 +3,11 @@ package io.omnika.services.channel.telegram;
 import io.omnika.common.channel.api.config.EnableChannelApi;
 import io.omnika.common.ipc.config.EnableIpc;
 import io.omnika.common.security.config.EnableSecurity;
+import org.apache.zookeeper.WatchedEvent;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
@@ -22,6 +24,11 @@ public class TelegramChannelApplication {
     @Bean
     public TelegramBotsApi telegramBotsApi() throws TelegramApiException {
         return new TelegramBotsApi(DefaultBotSession.class);
+    }
+
+    @EventListener(WatchedEvent.class)
+    public void aba(WatchedEvent event) {
+        System.out.println(event);
     }
 
 }

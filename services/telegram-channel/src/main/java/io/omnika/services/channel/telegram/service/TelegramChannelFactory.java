@@ -6,7 +6,6 @@ import io.omnika.common.model.channel.TelegramBotChannelConfig;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 

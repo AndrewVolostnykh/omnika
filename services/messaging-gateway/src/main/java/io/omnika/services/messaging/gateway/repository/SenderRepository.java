@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface SenderRepository extends JpaRepository<SenderEntity, UUID> {
     SenderEntity findByExternalIdAndChannelType(String externalId, ChannelType channelType);
 
+    SenderEntity findByExternalId(String externalId);
+
 }

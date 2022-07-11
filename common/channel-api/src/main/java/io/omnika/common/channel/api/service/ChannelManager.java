@@ -39,15 +39,16 @@ public class ChannelManager {
     @PostConstruct
     public void init() {
         queueService.subscribe(Topics.channelEvents(getChannelType()), this::handleChannelEvent);
-        queueService.subscribe(Topics.outboundChannelMessages(), this::handleOutboundChannelMessage);
+        queueService.subscribe(Topics.outboundChannelMessages(getChannelType()), this::handleOutboundChannelMessage);
     }
 
     @EventListener(value = InstanceCountChangedEvent.class, condition = "#event.serviceType.toString() == 'TELEGRAM_CHANNEL'")
     public void rebalance(InstanceCountChangedEvent event) {
-        log.info("Got InstanceCountChangedEvent {}", event);
+        log.info("Got {}", event);
         Set<UUID> toRemove = new HashSet<>();
         channels.forEach((channelId, channelService) -> {
             if (!partitionService.isMyPartition(channelId)) {
+                log.info("Channel {} is not at assigned partition, stopping", channelId);
                 stop(channelService); // TODO: do in parallel
                 toRemove.add(channelId);
             }
@@ -85,6 +86,7 @@ public class ChannelManager {
         ChannelConfig config = event.getChannelConfig();
 
         if (!partitionService.isMyPartition(channelId)) {
+            log.info("Channel {} is not at assigned partition", channelId);
             return;
         }
 

@@ -1,6 +1,3 @@
-server:
-  port: ${SERVER_PORT:8082}
-
 telegram:
   bot:
     enabled: ${TELEGRAM_BOT_ENABLED:true}

@@ -2,7 +2,6 @@ package io.omnika.services.channel.telegram;
 
 import io.omnika.common.channel.api.config.EnableChannelApi;
 import io.omnika.common.ipc.config.EnableIpc;
-import io.omnika.common.security.config.EnableSecurity;
 import org.apache.zookeeper.WatchedEvent;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

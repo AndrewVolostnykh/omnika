@@ -19,8 +19,8 @@ public class Topics {
         return "inbound-channel-messages";
     }
 
-    public static String outboundChannelMessages() {
-        return "outbound-channel-messages";
+    public static String outboundChannelMessages(ChannelType channelType) {
+        return "outbound-channel-messages." + channelType.name().toLowerCase();
     }
 
 }

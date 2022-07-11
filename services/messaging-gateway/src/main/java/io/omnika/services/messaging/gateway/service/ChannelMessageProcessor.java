@@ -7,6 +7,7 @@ import io.omnika.common.ipc.service.QueueService;
 import io.omnika.common.model.channel.ChannelMessage;
 import io.omnika.common.model.channel.ChannelMessageType;
 import io.omnika.common.model.channel.ChannelSession;
+import io.omnika.common.model.channel.ChannelType;
 import io.omnika.common.model.channel.Sender;
 import io.omnika.services.messaging.gateway.core.service.ChannelMessageService;
 import io.omnika.services.messaging.gateway.core.service.ChannelSessionService;
@@ -69,10 +70,10 @@ public class ChannelMessageProcessor {
         if (channelSession == null) {
             throw new IllegalArgumentException("Unknown channel session");
         }
-        Sender sender = senderService.findSenderById(userId);
+        Sender sender = senderService.findSenderByExternalId(userId.toString());
         if (sender == null) {
             sender = new Sender();
-            sender.setId(userId);
+            sender.setExternalId(userId.toString());
             sender = senderService.createSender(sender);
         }
 
@@ -81,8 +82,8 @@ public class ChannelMessageProcessor {
                 .externalSessionId(channelSession.getExternalId())
                 .text(text)
                 .build();
-        queueService.sendMessage(channelSession.getChannelType().getChannelServiceType(),
-                Topics.outboundChannelMessages(), message, message.getChannelId());
+        ChannelType channelType = channelSession.getChannelType();
+        queueService.sendMessage(channelType.getChannelServiceType(), Topics.outboundChannelMessages(channelType), message, message.getChannelId());
 
         ChannelMessage channelMessage = new ChannelMessage();
         channelMessage.setChannelSessionId(channelSession.getId());

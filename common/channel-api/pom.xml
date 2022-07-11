@@ -17,10 +17,6 @@
             <artifactId>ipc</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.omnika.common.rest</groupId>
-            <artifactId>rest</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.omnika.common</groupId>
             <artifactId>model</artifactId>
         </dependency>

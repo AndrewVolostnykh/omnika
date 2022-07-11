@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
@@ -22,6 +23,7 @@ import java.util.function.Consumer;
 public class QueueService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaAdmin kafkaAdmin;
     private final DiscoveryService discoveryService;
     private final PartitionService partitionService;
     private final ConsumerFactory consumerFactory;
@@ -35,7 +37,9 @@ public class QueueService {
     }
 
     public void sendMessage(ServiceType serviceType, String topic, Object payload, Object partitionKey) {
+        // todo: kafkaAdmin.describeTopics - get partitions count - calculate partition index
         Integer partitionIndex = partitionService.getPartitionIndex(serviceType, partitionKey);
+        // todo: 10 partitions but 2 instances - will go to first two partitions
         sendMessage(topic, payload, partitionIndex, null);
     }
 

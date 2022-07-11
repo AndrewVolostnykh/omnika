@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +33,8 @@ class SenderServiceImpl implements SenderService {
     }
 
     @Override
-    public Sender findSenderById(UUID id) {
-        return senderRepository.findById(id)
+    public Sender findSenderByExternalId(String externalId) {
+        return Optional.ofNullable(senderRepository.findByExternalId(externalId))
                 .map(senderMapper::toDto)
                 .orElse(null);
     }

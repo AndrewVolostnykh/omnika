@@ -22,7 +22,7 @@ public interface TenantController {
     Tenant createTenant(@RequestBody Tenant tenant);
 
     @PutMapping
-    @PreAuthorize("hasAuthority('SYSADMIN')")
+    @PreAuthorize("hasAuthority('TENANT_ADMIN')") // todo: think about sign up - fix api
     Tenant updateTenant(@RequestBody Tenant tenant);
 
     @GetMapping("/{tenantId}")

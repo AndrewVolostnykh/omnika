@@ -9,6 +9,7 @@ import io.omnika.common.ipc.service.QueueService;
 import io.omnika.common.model.channel.Channel;
 import io.omnika.common.model.channel.ChannelType;
 import io.omnika.common.model.channel.ServiceType;
+import io.omnika.common.utils.hibernate.HibernateUtils;
 import io.omnika.services.management.core.service.ChannelService;
 import io.omnika.services.management.mappers.ChannelMapper;
 import io.omnika.services.management.model.ChannelEntity;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +33,9 @@ class ChannelServiceImpl implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ChannelMapper channelMapper;
     private final QueueService queueService;
+    private final HibernateUtils hibernateUtils;
 
+    @Transactional
     @Override
     public Channel createChannel(UUID tenantId, Channel channel) {
         channel.setId(null);
@@ -49,6 +53,7 @@ class ChannelServiceImpl implements ChannelService {
     // FIXME: add pagination. According to large sets of channels in future, we need to use pagination (yes, also for queue-messaging)
 
 
+    @Transactional(readOnly = true)
     @Override
     public List<Channel> getChannelsByTenantId(UUID tenantId) {
         return channelRepository.findAllByTenantId(tenantId).stream()
@@ -56,6 +61,7 @@ class ChannelServiceImpl implements ChannelService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<Channel> getChannelsByType(ChannelType type, PageRequest pageRequest) {
         return channelRepository.findByChannelType(type, pageRequest)
@@ -71,12 +77,15 @@ class ChannelServiceImpl implements ChannelService {
     @AfterStartUp
     public void initQueueApi() {
         queueService.<ChannelsRequest>subscribeAndRespond(Topics.getChannels(), (channelsRequest, replier) -> {
-            DaoUtils.processInBatches(pageRequest -> {
-                return getChannelsByType(channelsRequest.getChannelType(), pageRequest);
-            }, channel -> {
-                ChannelEntityEvent channelEntityEvent = new ChannelEntityEvent(channel.getTenantId(), channel.getId(), channel.getConfig());
-                replier.accept(channelEntityEvent);
-            }, 100);
+            hibernateUtils.doInNewTransaction(() -> {
+                DaoUtils.processInBatches(pageRequest -> {
+                    return getChannelsByType(channelsRequest.getChannelType(), pageRequest);
+                }, channel -> {
+                    ChannelEntityEvent channelEntityEvent = new ChannelEntityEvent(channel.getTenantId(), channel.getId(), channel.getConfig());
+                    replier.accept(channelEntityEvent);
+                }, 100);
+                return null;
+            });
         });
     }
 

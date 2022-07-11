@@ -25,9 +25,4 @@ public class TelegramChannelApplication {
         return new TelegramBotsApi(DefaultBotSession.class);
     }
 
-    @EventListener(WatchedEvent.class)
-    public void aba(WatchedEvent event) {
-        System.out.println(event);
-    }
-
 }

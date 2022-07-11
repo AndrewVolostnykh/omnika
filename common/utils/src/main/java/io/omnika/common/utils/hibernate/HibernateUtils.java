@@ -2,6 +2,7 @@ package io.omnika.common.utils.hibernate;
 
 import java.util.concurrent.Callable;
 import javax.persistence.EntityManager;
+
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.hibernate.Hibernate;
@@ -33,7 +34,14 @@ public class HibernateUtils {
 
     @SneakyThrows
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public <T> T doInNewTransaction(Callable<T> callable) {
-        return callable.call();
+    public <T> T doInNewTransaction(Callable<T> task) {
+        return task.call();
     }
+
+    @SneakyThrows
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void doInNewTransaction(Runnable task) {
+        task.run();
+    }
+
 }

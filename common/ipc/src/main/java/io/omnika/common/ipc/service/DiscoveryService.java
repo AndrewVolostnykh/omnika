@@ -1,6 +1,5 @@
 package io.omnika.common.ipc.service;
 
-import io.omnika.common.ipc.config.AfterStartUp;
 import io.omnika.common.ipc.events.InstanceCountChangedEvent;
 import io.omnika.common.model.channel.ServiceType;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -29,6 +28,7 @@ public class DiscoveryService {
     private final DiscoveryClient discoveryClient;
     private final ServiceInstanceRegistration currentInstanceInfo;
     private final ApplicationEventPublisher eventPublisher;
+    private final ScheduledExecutorService scheduler;
 
     private ServiceType serviceType;
     @Value("${spring.application.name}")
@@ -39,7 +39,7 @@ public class DiscoveryService {
     @PostConstruct
     private void init() {
         this.serviceType = ServiceType.getByName(serviceId);
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+        scheduler.scheduleAtFixedRate(() -> {
             updateServiceList();
         }, 0, 1, TimeUnit.SECONDS);
     }

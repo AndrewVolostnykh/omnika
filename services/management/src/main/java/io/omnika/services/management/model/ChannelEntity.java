@@ -43,7 +43,7 @@ public class ChannelEntity extends BaseEntity {
     @JoinColumn(name = "tenant_id")
     private TenantEntity tenant;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "assigned_channels",
             joinColumns = @JoinColumn(name = "chanel_id"),
@@ -51,35 +51,4 @@ public class ChannelEntity extends BaseEntity {
     )
     private Set<UserEntity> assignedUsers;
 
-    public ChannelType getChannelType() {
-        return channelType;
-    }
-
-    public void setChannelType(ChannelType channelType) {
-        this.channelType = channelType;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public JsonNode getConfig() {
-        return config;
-    }
-
-    public void setConfig(JsonNode config) {
-        this.config = config;
-    }
-
-    public TenantEntity getTenant() {
-        return tenant;
-    }
-
-    public void setTenant(TenantEntity tenant) {
-        this.tenant = tenant;
-    }
 }

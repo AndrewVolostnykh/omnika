@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class DaoUtils {
+public class DaoUtils { // todo: move to common utils
 
     public static <T> void processInBatches(Function<PageRequest, Page<T>> finderFunction,
                                             Consumer<T> processor, int batchSize) {

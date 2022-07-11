@@ -19,6 +19,6 @@ public class ChannelMessage {
     private LocalDateTime receivedAt;
     private UUID channelSessionId;
     private UUID senderId;
-    private String externalId; // for now needed only for instagram. but take aware that will be nice to write it also for telegram
+    private String externalId;
 
 }

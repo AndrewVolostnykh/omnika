@@ -1,0 +1,22 @@
+server:
+  port: ${SERVER_PORT:8084}
+
+security: # security should be fully disabled
+  token:
+    signing_key: ${SECURITY_TOKEN_SIGNING_KEY:abababa}
+    lifetime: ${SECURITY_TOKEN_LIFETIME:86400}  # 24 hours by default
+    request_header: ${SECURITY_TOKEN_REQUEST_HEADER:Authorization}
+
+spring:
+  application: instagram-channel
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+  ### it doesn't works for several consumers
+  cloud:
+    zookeeper:
+      connect-string: ${ZOOKEEPER_CONNECT_STRING:localhost:2181}

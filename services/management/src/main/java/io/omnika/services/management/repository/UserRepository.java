@@ -1,23 +1,24 @@
 package io.omnika.services.management.repository;
 
 import io.omnika.common.security.model.Authority;
-import io.omnika.services.management.model.User;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import io.omnika.services.management.model.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 @Repository
-public interface UserRepository extends JpaRepository<User, UUID> {
+public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     boolean existsByEmail(String email);
 
-    Optional<User> findByEmail(String email);
+    Optional<UserEntity> findByEmail(String email);
 
-    Optional<User> findByActivationToken(UUID activationToken);
+    Optional<UserEntity> findByActivationToken(UUID activationToken);
 
-    List<User> findAllByTenantId(UUID tenantId);
+    List<UserEntity> findAllByTenantId(UUID tenantId);
 
-    List<User> findAllByAuthorityAndTenantId(Authority authority, UUID tenantId);
+    List<UserEntity> findAllByAuthorityAndTenantId(Authority authority, UUID tenantId);
 
 }

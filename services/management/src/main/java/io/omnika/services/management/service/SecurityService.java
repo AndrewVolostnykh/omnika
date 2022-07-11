@@ -1,9 +1,8 @@
 package io.omnika.services.management.service;
 
-import io.omnika.common.rest.services.management.dto.UserDto;
+import io.omnika.common.rest.services.management.dto.User;
 import io.omnika.common.rest.services.management.dto.auth.TokenDto;
-import io.omnika.services.management.converters.UserConverter;
-import io.omnika.services.management.model.User;
+import io.omnika.services.management.mappers.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,14 +11,10 @@ import org.springframework.stereotype.Service;
 public class SecurityService {
 
     private final TokenService tokenService;
-    private final UserConverter userConverter;
 
-    public TokenDto refresh(UserDto user) {
-
-        User domain = userConverter.toDomain(user);
-
-        String accessToken = tokenService.createToken(domain);
-        String newRefreshToken = tokenService.createRefreshToken(domain);
+    public TokenDto refresh(User user) {
+        String accessToken = tokenService.createToken(user);
+        String newRefreshToken = tokenService.createRefreshToken(user);
 
         return new TokenDto(accessToken, newRefreshToken);
     }

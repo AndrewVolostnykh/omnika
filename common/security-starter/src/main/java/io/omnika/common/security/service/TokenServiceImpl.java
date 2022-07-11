@@ -25,7 +25,7 @@ public class TokenServiceImpl implements TokenService {
     @Value("${security.token.signing_key}")
     protected String tokenSigningKey;
     @Getter
-    @Value("${security.token.request_header:X-Authorization}")
+    @Value("${security.token.request_header:Authorization}")
     private String tokenRequestHeader;
 
     @Override

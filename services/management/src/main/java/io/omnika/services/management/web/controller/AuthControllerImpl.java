@@ -33,7 +33,7 @@ public class AuthControllerImpl extends BaseController implements AuthController
 
     @Override
     @PreAuthorize("hasRole('TENANT_ADMIN')")
-    public void signUpManger(@Valid CreateManagerDto createManagerDto) {
+    public void signUpManager(@Valid CreateManagerDto createManagerDto) {
         userService.signUpManager(getPrincipal().getTenantId(), createManagerDto);
     }
 
@@ -65,7 +65,7 @@ public class AuthControllerImpl extends BaseController implements AuthController
     @Override
     public TokenDto refresh(HttpServletRequest request) {
         UUID userId = tokenService.getUserId(tokenService.extractToken(request));
-        return securityService.refresh(userService.get(userId));
+        return securityService.refresh(userService.getUserById(userId));
     }
 //
 //    @Override

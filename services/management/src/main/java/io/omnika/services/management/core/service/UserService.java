@@ -1,11 +1,13 @@
 package io.omnika.services.management.core.service;
 
-import io.omnika.common.rest.services.management.dto.UserDto;
+import io.omnika.common.rest.services.management.dto.User;
 import io.omnika.common.rest.services.management.dto.auth.SetPasswordDto;
 import io.omnika.common.rest.services.management.dto.auth.SignUpDto;
 import io.omnika.common.rest.services.management.dto.auth.SigningDto;
 import io.omnika.common.rest.services.management.dto.auth.TokenDto;
 import io.omnika.common.rest.services.management.dto.manager.CreateManagerDto;
+import io.omnika.common.security.model.Authority;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -21,11 +23,10 @@ public interface UserService {
 
     TokenDto setPassword(UUID activationToken, SetPasswordDto setPasswordDto);
 
-    UserDto getCurrent();
+    User getCurrentUser();
 
-    List<UserDto> list(UUID tenantId);
+    List<User> getUsersByTenantIdAndAuthority(UUID tenantId, Authority authority);
 
-    UserDto get(UUID id);
+    User getUserById(UUID id);
 
-    List<UserDto> listManagers(UUID tenantId);
 }

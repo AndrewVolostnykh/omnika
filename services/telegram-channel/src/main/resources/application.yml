@@ -1,29 +1,26 @@
-server:
-  port: ${SERVER_PORT:8082}
-
 telegram:
   bot:
     enabled: ${TELEGRAM_BOT_ENABLED:true}
 
-security: # security should be fully disabled
-  token:
-    signing_key: ${SECURITY_TOKEN_SIGNING_KEY:abababa}
-    lifetime: ${SECURITY_TOKEN_LIFETIME:86400}  # 24 hours by default
-    request_header: ${SECURITY_TOKEN_REQUEST_HEADER:X-Authorization}
-
 spring:
-  application: telegram-channel
+  application:
+    name: telegram-channel
 
-  rabbitmq:
-    host: ${RABBITMQ_HOST:localhost}
-    port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:guest}
-    password: ${RABBITMQ_PASSWORD:guest}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: telegram-channel-consumer-group
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: '*'
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-  ### it doesn't works for several consumers
   cloud:
-    function:
-      definition: allTelegramChannels;newTelegramChannel;toTelegramChannelMessage;test
-
     zookeeper:
       connect-string: ${ZOOKEEPER_CONNECT_STRING:localhost:2181}
+
+logging:
+  level:
+    org.apache.kafka: WARN
+    io.omnika.common.ipc: DEBUG

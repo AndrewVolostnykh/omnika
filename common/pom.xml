@@ -20,6 +20,8 @@
         <module>ipc</module>
         <module>utils</module>
         <module>core</module>
+        <module>channel-api</module>
+        <module>model</module>
     </modules>
 
     <dependencies>
@@ -27,7 +29,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

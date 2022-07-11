@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Import;
 @Target(ElementType.TYPE)
 @EnableDiscoveryClient
 @EnableFeignClients
-@Import(IpcConfiguration.class)
+@Import(IpcConfig.class)
 public @interface EnableIpc {
 
 }

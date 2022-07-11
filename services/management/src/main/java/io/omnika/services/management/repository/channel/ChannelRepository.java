@@ -1,22 +1,25 @@
 package io.omnika.services.management.repository.channel;
 
-import io.omnika.common.rest.services.management.model.ChannelType;
-import io.omnika.services.management.model.Channel;
-import io.omnika.services.management.model.User;
-import java.util.List;
-import java.util.UUID;
+import io.omnika.common.model.channel.ChannelType;
+import io.omnika.services.management.model.ChannelEntity;
+import io.omnika.services.management.model.UserEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.UUID;
+
 @Repository
-public interface ChannelRepository extends JpaRepository<Channel, Long> {
+public interface ChannelRepository extends JpaRepository<ChannelEntity, Long> {
 
-    List<Channel> findAllByTenantIdAndChannelType(UUID tenantId, ChannelType channelType);
+    List<ChannelEntity> findAllByTenantIdAndChannelType(UUID tenantId, ChannelType channelType);
 
-    List<Channel> findAllByChannelType(ChannelType type);
+    Page<ChannelEntity> findByChannelType(ChannelType channelType, Pageable pageable);
 
-    List<Channel> findAllByTenantId(UUID tenantId);
+    List<ChannelEntity> findAllByTenantId(UUID tenantId);
 
-    List<Channel> findAllByAssignedUsersContainsAndTenantId(User user, UUID tenantId);
+    List<ChannelEntity> findAllByAssignedUsersContainsAndTenantId(UserEntity user, UUID tenantId);
 
 }

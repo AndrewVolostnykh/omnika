@@ -1,14 +1,15 @@
 package io.omnika.services.management.web.controller;
 
+import io.omnika.common.model.channel.Channel;
 import io.omnika.common.rest.controller.BaseController;
 import io.omnika.common.rest.services.management.ChannelController;
-import io.omnika.common.rest.services.management.dto.channel.ChannelDto;
 import io.omnika.services.management.core.service.ChannelService;
-import java.util.List;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,15 +18,19 @@ public class ChannelControllerImpl extends BaseController implements ChannelCont
     private final ChannelService channelService;
 
     @Override
-    @PreAuthorize("hasAuthority('TENANT_ADMIN')")
-    public ChannelDto create(@Valid ChannelDto channelDto) {
-        return channelService.create(getPrincipal().getTenantId(), channelDto);
+    public Channel createChannel(@Valid Channel channel) {
+        return channelService.createChannel(getTenantId(), channel);
+    }
+
+    @Override
+    public Channel updateChannel(Channel channel) {
+        return null;
     }
 
     @Override
     @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'MANAGER')")
-    public List<ChannelDto> list() {
-        return channelService.list(getPrincipal().getTenantId());
+    public List<Channel> listChannels() {
+        return channelService.getChannelsByTenantId(getTenantId());
     }
 
     //    // FIXME: remove

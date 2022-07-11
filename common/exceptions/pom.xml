@@ -11,7 +11,7 @@
 
     <groupId>io.omnika.common.exceptions</groupId>
     <artifactId>exceptions</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
 
 </project>

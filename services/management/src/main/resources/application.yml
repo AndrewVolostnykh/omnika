@@ -10,7 +10,7 @@ spring:
 
   datasource:
 #    driver-class-name: org.postgresql.Driver
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/omnika-management-service}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/omnika_management_service}
     username: ${DATABASE_USERNAME:postgres}
     password: ${DATABASE_PASSWORD:postgres}
   jpa:
@@ -20,22 +20,31 @@ spring:
     enabled: false
     locations: classpath:db/migration/common
 
-  rabbitmq:
-    host: ${RABBITMQ_HOST:localhost}
-    port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:guest}
-    password: ${RABBITMQ_PASSWORD:guest}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: management-service-consumer-group
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: '*'
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
   cloud:
     zookeeper:
       connect-string: ${ZOOKEEPER_CONNECT_STRING:localhost:2181}
-
-    function:
-      definition: getAllChannels
 
 security:
   token:
     signing_key: ${SECURITY_TOKEN_SIGNING_KEY:abababa}
     lifetime: ${SECURITY_TOKEN_LIFETIME:7200}  # 2 hours by default
     refresh_lifetime: ${SECURITY_REFRESH_TOKEN_LIFETIME:604800} # 7 days by default
-    request_header: ${SECURITY_TOKEN_REQUEST_HEADER:X-Authorization}
+    request_header: ${SECURITY_TOKEN_REQUEST_HEADER:Authorization}
+  sysadmin:
+    email: sysadmin@omnika.io
+    password: sysadmin
+
+logging:
+  level:
+    org.apache.kafka: WARN
+    io.omnika.common.ipc: DEBUG

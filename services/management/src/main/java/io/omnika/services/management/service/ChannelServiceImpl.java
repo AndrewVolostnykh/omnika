@@ -1,138 +1,92 @@
 package io.omnika.services.management.service;
 
-import io.omnika.common.ipc.streams.SendToStream;
-import io.omnika.common.rest.services.management.dto.channel.ChannelDto;
-import io.omnika.common.rest.services.management.model.ChannelType;
-import io.omnika.common.security.model.Authority;
-import io.omnika.common.security.model.UserPrincipal;
-import io.omnika.common.security.utils.AuthenticationHelper;
+import io.omnika.common.ipc.config.AfterStartUp;
+import io.omnika.common.ipc.config.Topics;
+import io.omnika.common.ipc.dto.ChannelsRequest;
+import io.omnika.common.ipc.events.ChannelEntityEvent;
+import io.omnika.common.ipc.events.EntityEventType;
+import io.omnika.common.ipc.service.QueueService;
+import io.omnika.common.model.channel.Channel;
+import io.omnika.common.model.channel.ChannelType;
+import io.omnika.common.model.channel.ServiceType;
 import io.omnika.common.utils.hibernate.HibernateUtils;
-import io.omnika.services.management.converters.ChannelConverter;
 import io.omnika.services.management.core.service.ChannelService;
-import io.omnika.services.management.model.Channel;
-import io.omnika.services.management.model.User;
+import io.omnika.services.management.mappers.ChannelMapper;
+import io.omnika.services.management.model.ChannelEntity;
 import io.omnika.services.management.repository.channel.ChannelRepository;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
+import io.omnika.services.management.utils.DaoUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 class ChannelServiceImpl implements ChannelService {
-
-    private static final Map<ChannelType, String> newChannelExchanges = Map.of(
-            ChannelType.TELEGRAM_BOT, "newTelegramChannel-in-0",
-            ChannelType.INSTAGRAM, "newInstagramChannel-in-0"
-    );
-
-    private static final String ALL_TELEGRAM_CHANNELS_EXCHANGE = "allTelegramChannels";
-    private static final String ALL_VIBER_CHANNELS_EXCHANGE = "allViberChannels";
-    private static final String ALL_INSTAGRAM_CHANNELS_EXCHANGE = "allInstagramChannels";
-
     private final ChannelRepository channelRepository;
-    private final ChannelConverter channelConverter;
+    private final ChannelMapper channelMapper;
+    private final QueueService queueService;
     private final HibernateUtils hibernateUtils;
-    private final StreamBridge streamBridge;
 
+    @Transactional
     @Override
-    public ChannelDto create(UUID tenantId, ChannelDto channelDto) {
-        channelDto.setTenantId(tenantId);
+    public Channel createChannel(UUID tenantId, Channel channel) {
+        channel.setId(null);
+        channel.setTenantId(tenantId);
 
-        Channel toSave = channelConverter.toDomain(channelDto);
-
-        Channel saved = channelRepository.save(toSave);
+        ChannelEntity channelEntity = channelMapper.toDomain(channel);
+        channelEntity = channelRepository.save(channelEntity);
         // TODO: WARNING! Write a test for converting config json
-        ChannelDto savedDto = channelConverter.toDto(saved);
-
-        // TODD: wrap it more clearly
-        streamBridge.send(newChannelExchanges.get(savedDto.getChannelType()), savedDto);
-
-        return savedDto;
-    }
-
-    @Bean
-    public Consumer<ChannelType> getAllChannels(ChannelServiceImpl channelService) {
-        return channelType -> {
-            log.warn("Received getAllChannels event with channel type [{}]", channelType);
-            List<ChannelDto> channelDtos;
-
-            switch (channelType) {
-                case TELEGRAM_BOT: {
-                    channelDtos = channelService.listTelegramChannelsToServices();
-                    break;
-                }
-                case VIBER_BOT: {
-                    channelDtos = channelService.listViberChannelsToServices();
-                    break;
-                }
-                case INSTAGRAM: {
-                    channelDtos = channelService.listInstagramChannelsToServices();
-                    break;
-                }
-                default:
-                    // change it to reserved exception
-                    throw new IllegalStateException(channelType.name());
-            }
-
-            log.debug("Sent [{}] channels to services\n [{}]", channelType, channelDtos);
-        };
+        channel = channelMapper.toDto(channelEntity);
+        sendChannelEvent(channel, EntityEventType.CREATED);
+        return channel;
     }
 
     // FIXME: change to database view, because it takes too long time to convert every entity to needed type
     // FIXME: add pagination. According to large sets of channels in future, we need to use pagination (yes, also for queue-messaging)
-    @SendToStream(exchange = ALL_TELEGRAM_CHANNELS_EXCHANGE)
-    public List<ChannelDto> listTelegramChannelsToServices() {
-        return hibernateUtils.doInNewTransaction(() -> listAllByType(ChannelType.TELEGRAM_BOT));
-    }
 
-    @SendToStream(exchange = ALL_VIBER_CHANNELS_EXCHANGE)
-    public List<ChannelDto> listViberChannelsToServices() {
-        return hibernateUtils.doInNewTransaction(() -> listAllByType(ChannelType.VIBER_BOT));
-    }
 
-    @SendToStream(exchange = ALL_INSTAGRAM_CHANNELS_EXCHANGE)
-    public List<ChannelDto> listInstagramChannelsToServices() {
-        return hibernateUtils.doInNewTransaction(() -> listAllByType(ChannelType.INSTAGRAM));
-    }
-
-//    @Transactional(readOnly = true)
-//    public List<ChannelDto> listByType(UUID tenantId, ChannelType channelType) {
-//        return channelRepository.findAllByTenantIdAndChannelType(tenantId, channelType).stream()
-//                .map(channelConverter::toDto)
-//                .collect(Collectors.toList());
-//    }
-
-    private List<ChannelDto> listAllByType(ChannelType type) {
-        return channelRepository.findAllByChannelType(type).stream()
-                .map(channelConverter::toDto)
-                .collect(Collectors.toList());
-    }
-
+    @Transactional(readOnly = true)
     @Override
-    public List<ChannelDto> list(UUID tenantId) {
-
-        UserPrincipal userPrincipal = AuthenticationHelper.getAuthenticationDetails();
-
-        // what the shit is this ?
-        if (Authority.MANAGER.name().equals(userPrincipal.getAuthority().getAuthority())) {
-            return channelRepository.findAllByAssignedUsersContainsAndTenantId(
-                    new User(userPrincipal.getUserId()), userPrincipal.getTenantId())
-                    .stream()
-                    .map(channelConverter::toDto)
-                    .collect(Collectors.toList());
-        }
-
-        return channelRepository.findAllByTenantId(tenantId)
-                .stream()
-                .map(channelConverter::toDto)
+    public List<Channel> getChannelsByTenantId(UUID tenantId) {
+        return channelRepository.findAllByTenantId(tenantId).stream()
+                .map(channelMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<Channel> getChannelsByType(ChannelType type, PageRequest pageRequest) {
+        return channelRepository.findByChannelType(type, pageRequest)
+                .map(channelMapper::toDto);
+    }
+
+    private void sendChannelEvent(Channel channel, EntityEventType eventType) {
+        ChannelEntityEvent channelEntityEvent = new ChannelEntityEvent(channel.getTenantId(), channel.getId(), channel.getConfig(), eventType);
+        ServiceType serviceType = channel.getChannelType().getChannelServiceType();
+        queueService.sendMessage(serviceType, Topics.channelEvents(channel.getChannelType()), channelEntityEvent, channel.getId());
+    }
+
+    @AfterStartUp
+    public void initQueueApi() {
+        queueService.<ChannelsRequest>subscribeAndRespond(Topics.getChannels(), (channelsRequest, replier) -> {
+            hibernateUtils.doInNewTransaction(() -> {
+                DaoUtils.processInBatches(pageRequest -> {
+                    return getChannelsByType(channelsRequest.getChannelType(), pageRequest);
+                }, channel -> {
+                    ChannelEntityEvent channelEntityEvent = new ChannelEntityEvent(channel.getTenantId(), channel.getId(), channel.getConfig());
+                    replier.accept(channelEntityEvent);
+                }, 100);
+                return null;
+            });
+        });
+    }
+
 }

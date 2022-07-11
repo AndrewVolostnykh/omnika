@@ -1,6 +1,6 @@
 package io.omnika.services.management.core.service;
 
-import io.omnika.common.rest.services.management.dto.channel.TelegramBotChannelConfig;
+import io.omnika.common.model.channel.TelegramBotChannelConfig;
 
 public interface TelegramChannelBotService {
 

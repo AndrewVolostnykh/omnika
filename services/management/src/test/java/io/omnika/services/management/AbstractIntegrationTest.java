@@ -6,12 +6,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.omnika.common.rest.services.management.dto.TenantDto;
-import io.omnika.common.rest.services.management.dto.UserDto;
+import io.omnika.common.rest.services.management.dto.Tenant;
+import io.omnika.common.rest.services.management.dto.User;
 import io.omnika.common.rest.services.management.dto.auth.SetPasswordDto;
 import io.omnika.common.rest.services.management.dto.auth.SigningDto;
 import io.omnika.common.rest.services.management.dto.auth.TokenDto;
-import io.omnika.common.rest.services.management.dto.channel.TelegramBotChannelConfig;
+import io.omnika.common.model.channel.TelegramBotChannelConfig;
 import io.omnika.common.rest.services.management.dto.manager.CreateManagerDto;
 import io.omnika.common.rest.services.management.dto.manager.ManagerDto;
 import io.omnika.services.management.repository.UserRepository;
@@ -112,27 +112,27 @@ public abstract class AbstractIntegrationTest {
     }
 
     @SneakyThrows
-    protected UserDto getCurrentUser(TokenDto token) {
+    protected User getCurrentUser(TokenDto token) {
         MvcResult mvcResult = mockMvc.perform(get("/user/current").header("X-Authorization", token.getAccessToken())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        return objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserDto.class);
+        return objectMapper.readValue(mvcResult.getResponse().getContentAsString(), User.class);
     }
 
     @SneakyThrows
-    protected TenantDto createTenant(TenantDto tenantDto, TokenDto token) {
+    protected Tenant createTenant(Tenant tenant, TokenDto token) {
         MvcResult mvcResult = mockMvc.perform(post("/tenant").header("X-Authorization", token.getAccessToken())
-                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(tenantDto)))
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(tenant)))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        return objectMapper.readValue(mvcResult.getResponse().getContentAsString(), TenantDto.class);
+        return objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Tenant.class);
     }
 
     @SneakyThrows
-    protected List<TenantDto> listTenants(TokenDto tokenDto) {
+    protected List<Tenant> listTenants(TokenDto tokenDto) {
         MvcResult mvcResult = mockMvc.perform(get("/tenant").header("X-Authorization", tokenDto.getAccessToken())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

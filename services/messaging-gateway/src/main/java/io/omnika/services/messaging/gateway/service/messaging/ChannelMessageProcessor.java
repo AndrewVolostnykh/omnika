@@ -1,4 +1,4 @@
-package io.omnika.services.messaging.gateway.service;
+package io.omnika.services.messaging.gateway.service.messaging;
 
 import io.omnika.common.ipc.config.Topics;
 import io.omnika.common.ipc.dto.InboundChannelMessage;
@@ -29,6 +29,7 @@ public class ChannelMessageProcessor {
     private final ChannelSessionService channelSessionService;
     private final SenderService senderService;
     private final ChannelMessageService channelMessageService;
+    private final ChannelMessageSubscriptionService channelMessageSubscriptionService;
 
     @PostConstruct
     private void init() {
@@ -37,6 +38,11 @@ public class ChannelMessageProcessor {
 
     private void handleInboundChannelMessage(InboundChannelMessage message) {
         ChannelSession channelSession = channelSessionService.findChannelSessionByExternalIdAndChannelId(message.getSessionId(), message.getChannelId());
+        /*
+        * store in cache the list of channels allowed for the user
+        * when channel configuration changes -> update this list (e.g. if assigned users list was updated)
+        * if channel is now not accessible - send ws event about removal of the sessions for this channel
+        * */
         if (channelSession == null) {
             channelSession = new ChannelSession();
             channelSession.setExternalId(message.getSessionId());
@@ -62,7 +68,9 @@ public class ChannelMessageProcessor {
         channelMessage.setMessageType(ChannelMessageType.INBOUND);
         channelMessage.setReceivedAt(LocalDateTime.now());
         channelMessage.setExternalId(message.getId());
-        channelMessageService.createChannelMessage(channelMessage);
+        channelMessage = channelMessageService.createChannelMessage(channelMessage);
+
+        channelMessageSubscriptionService.handleNewMessage(channelSession, channelMessage);
     }
 
     public void sendOutboundChannelMessage(UUID tenantId, UUID userId, UUID channelSessionId, String text) {
@@ -90,7 +98,9 @@ public class ChannelMessageProcessor {
         channelMessage.setSenderId(sender.getId());
         channelMessage.setMessageType(ChannelMessageType.OUTBOUND);
         channelMessage.setText(text);
-        channelMessageService.createChannelMessage(channelMessage);
+        channelMessage = channelMessageService.createChannelMessage(channelMessage);
+
+        channelMessageSubscriptionService.handleNewMessage(channelSession, channelMessage);
     }
 
 }

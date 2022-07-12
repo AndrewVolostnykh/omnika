@@ -46,7 +46,7 @@ public class ChannelEntity extends BaseEntity {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "assigned_channels",
-            joinColumns = @JoinColumn(name = "chanel_id"),
+            joinColumns = @JoinColumn(name = "channel_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<UserEntity> assignedUsers;

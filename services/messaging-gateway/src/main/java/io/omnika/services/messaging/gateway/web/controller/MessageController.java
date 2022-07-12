@@ -2,28 +2,42 @@ package io.omnika.services.messaging.gateway.web.controller;
 
 import io.omnika.common.model.channel.ChannelMessage;
 import io.omnika.common.rest.controller.BaseController;
+import io.omnika.common.security.core.service.TokenService;
+import io.omnika.common.security.model.UserPrincipal;
 import io.omnika.services.messaging.gateway.core.service.ChannelMessageService;
-import io.omnika.services.messaging.gateway.service.ChannelMessageProcessor;
+import io.omnika.services.messaging.gateway.service.messaging.ChannelMessageProcessor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
 
-// TODO: user basic controller and interface from rest
-@RestController
-@RequestMapping("/message")
+@Controller
 @RequiredArgsConstructor
 public class MessageController extends BaseController {
 
     private final ChannelMessageProcessor messageProcessor;
     private final ChannelMessageService messageService;
+    private final TokenService tokenService;
+
+    // need to subscribe to all session a user has access to
+    @MessageMapping("/messages/session/{channelSessionId}")
+    public void subscribeToSessionMessages(@DestinationVariable UUID channelSessionId,
+                                           @Header("authorization") String token,
+                                           String text) {
+        UserPrincipal principal = tokenService.parseToken(token);
+        messageProcessor.sendOutboundChannelMessage(principal.getTenantId(), principal.getUserId(), channelSessionId, text);
+    }
+
 
     // there web socket connection
     // NOTE: it is important to validate before

@@ -9,7 +9,7 @@ package io.omnika.common.core.converters;
  * add entity B to constructor. To transform B dto to
  * domain we can use inside A converter another B converter.
  * But we have to be sure that this have method toDomain.
- * This interface simplify searching and calling needed method for
+ * This interface simplifies searching and calling needed method for
  * converting needed domain to dto and vise-versa.
  *
  * Generics: D = domain, T = transfer (DTO)

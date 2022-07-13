@@ -16,6 +16,7 @@ public class InboundChannelMessage {
     private String id;
     private String sessionId;
     private String userId;
+    private String userName;
     private String text;
     private ChannelType channelType;
     private UUID channelId;

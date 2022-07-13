@@ -7,8 +7,11 @@ import io.omnika.services.messaging.gateway.model.ChannelSessionEntity;
 import io.omnika.services.messaging.gateway.repository.ChannelSessionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +41,14 @@ class ChannelSessionServiceImpl implements ChannelSessionService {
         return channelSessionRepository.findByTenantIdAndId(tenantId, id)
                 .map(channelSessionMapper::toDto)
                 .orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<ChannelSession> findChannelSessionsByTenantId(UUID tenantId) {
+        return channelSessionRepository.findByTenantId(tenantId).stream()
+                .map(channelSessionMapper::toDto)
+                .collect(Collectors.toList());
     }
 
 }

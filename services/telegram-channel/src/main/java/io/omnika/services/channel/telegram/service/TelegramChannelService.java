@@ -41,6 +41,7 @@ public class TelegramChannelService extends ChannelService<TelegramBotChannelCon
                 .id(telegramMessage.getMessageId().toString())
                 .sessionId(telegramMessage.getChatId().toString())
                 .userId(telegramMessage.getFrom().getId().toString())
+                .userName(telegramMessage.getFrom().getFirstName())
                 .text(telegramMessage.getText())
                 .build();
         onNewMessage(message);

@@ -15,6 +15,7 @@ import java.util.UUID;
 public class ChannelSession {
 
     private UUID id;
+    private String name;
     private String externalId;
     private UUID channelId;
     private UUID tenantId;

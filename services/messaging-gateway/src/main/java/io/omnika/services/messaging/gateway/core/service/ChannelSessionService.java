@@ -2,6 +2,7 @@ package io.omnika.services.messaging.gateway.core.service;
 
 import io.omnika.common.model.channel.ChannelSession;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface ChannelSessionService {
@@ -11,5 +12,7 @@ public interface ChannelSessionService {
     ChannelSession findChannelSessionByExternalIdAndChannelId(String sessionId, UUID channelId);
 
     ChannelSession findChannelSessionByTenantIdAndId(UUID tenantId, UUID id);
+
+    List<ChannelSession> findChannelSessionsByTenantId(UUID tenantId);
 
 }

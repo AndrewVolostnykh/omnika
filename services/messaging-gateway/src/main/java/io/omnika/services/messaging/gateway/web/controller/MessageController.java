@@ -10,16 +10,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.messaging.simp.SimpMessageHeaderAccessor.USER_HEADER;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,12 +35,16 @@ public class MessageController extends BaseController {
     private final TokenService tokenService;
 
     // need to subscribe to all session a user has access to
+    @MessageMapping("/message/session/{channelSessionId}")
+    public void sendMessage(@DestinationVariable UUID channelSessionId,
+                            @Payload String text,
+                            UserPrincipal userPrincipal) {
+        messageProcessor.sendOutboundChannelMessage(userPrincipal.getTenantId(), userPrincipal.getUserId(), channelSessionId, text);
+    }
+
     @MessageMapping("/messages/session/{channelSessionId}")
-    public void subscribeToSessionMessages(@DestinationVariable UUID channelSessionId,
-                                           @Header("authorization") String token,
-                                           String text) {
-        UserPrincipal principal = tokenService.parseToken(token);
-        messageProcessor.sendOutboundChannelMessage(principal.getTenantId(), principal.getUserId(), channelSessionId, text);
+    public void listMessages() {
+
     }
 
 

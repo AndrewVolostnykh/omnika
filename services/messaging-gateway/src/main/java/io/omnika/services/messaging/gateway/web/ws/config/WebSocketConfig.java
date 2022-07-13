@@ -1,13 +1,16 @@
 package io.omnika.services.messaging.gateway.web.ws.config;
 
 import io.omnika.common.security.core.service.TokenService;
+import io.omnika.common.security.model.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.MethodParameter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.converter.StringMessageConverter;
+import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -17,6 +20,7 @@ import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -26,6 +30,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 @Configuration
@@ -103,23 +109,51 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registration.interceptors(new ChannelInterceptor() {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
+                UserPrincipal userPrincipal = null;
+                try {
+                    userPrincipal = retrievePrincipal(message);
+                } catch (Exception ignored) {
+                }
+
                 StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
                 String destination = StringUtils.trim(headerAccessor.getDestination());
                 if (StringUtils.startsWith(destination, "/user")) {
-                    try {
-                        String token = headerAccessor.getNativeHeader(tokenRequestHeader.toLowerCase()).stream().findFirst().orElse(null);
-                        String expectedUserId = tokenService.parseToken(token).getUserId().toString();
-                        String actualUserId = StringUtils.substringBetween(destination, "/user/", "/");
-                        if (!expectedUserId.equals(actualUserId)) {
-                            return null;
-                        }
-                    } catch (Exception e) {
+                    if (userPrincipal == null || !userPrincipal.getUserId().toString().equals(StringUtils.substringBetween(destination, "/user/", "/"))) {
                         return null;
                     }
                 }
                 return message;
             }
         });
+    }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        argumentResolvers.add(new HandlerMethodArgumentResolver() {
+            @Override
+            public boolean supportsParameter(MethodParameter parameter) {
+                return parameter.getParameterType().equals(UserPrincipal.class);
+            }
+
+            @Override
+            public Object resolveArgument(MethodParameter parameter, Message<?> message) throws Exception {
+                return retrievePrincipal(message);
+            }
+        });
+    }
+
+    private UserPrincipal retrievePrincipal(Message<?> message) throws IllegalArgumentException {
+        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
+        UserPrincipal userPrincipal;
+        try {
+            String token = Optional.ofNullable(headerAccessor.getNativeHeader(tokenRequestHeader.toLowerCase()))
+                    .flatMap(values -> values.stream().findFirst())
+                    .orElse(null);
+            userPrincipal = tokenService.parseToken(token);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("No principal");
+        }
+        return userPrincipal;
     }
 
     @Override

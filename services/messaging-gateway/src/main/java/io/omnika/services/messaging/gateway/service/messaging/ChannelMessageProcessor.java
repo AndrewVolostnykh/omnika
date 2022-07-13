@@ -45,6 +45,7 @@ public class ChannelMessageProcessor {
         * */
         if (channelSession == null) {
             channelSession = new ChannelSession();
+            channelSession.setName(message.getUserName());
             channelSession.setExternalId(message.getSessionId());
             channelSession.setChannelId(message.getChannelId());
             channelSession.setTenantId(message.getTenantId());

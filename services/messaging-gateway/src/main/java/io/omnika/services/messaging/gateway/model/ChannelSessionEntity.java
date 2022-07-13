@@ -19,6 +19,8 @@ import java.util.UUID;
 @Table(name = "channel_sessions")
 public class ChannelSessionEntity extends BaseEntity {
 
+    private String name;
+
     private String externalId;
 
     // id of user for assignment. Every of tenant can see every of sessions
